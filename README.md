@@ -1,6 +1,6 @@
 # astrologica — Hermes Agent Skill
 
-Hermes Agent skill for the [astrologica](https://github.com/gergeisabo/astrologica) local astrology engine.
+Hermes Agent skill for the [astrologica](https://github.com/gergeisabo/sweph-astrology) local astrology engine.
 
 ## What It Does
 
@@ -8,19 +8,19 @@ Gives Hermes Agent the ability to compute astrological charts and readings **ful
 
 ## Prerequisites
 
-- [astrologica](https://github.com/gergeisabo/astrologica) installed at `~/Projects/astrologica`
+- [astrologica](https://github.com/gergeisabo/sweph-astrology) installed at `~/Projects/astrologica`
 - Python 3.11+ with pyswisseph (the engine's venv handles this)
 
 ## Install
 
 ```bash
-hermes skills install gergeisabo/astrologica-skill
+hermes skills install gergeisabo/sweph-astrology-skill
 ```
 
 Or manual:
 ```bash
-git clone https://github.com/gergeisabo/astrologica-skill /tmp/astrologica-skill
-cp -r /tmp/astrologica-skill ~/.hermes/skills/astrology/astrologica
+git clone https://github.com/gergeisabo/sweph-astrology-skill /tmp/sweph-astrology-skill
+cp -r /tmp/sweph-astrology-skill ~/.hermes/skills/astrology/astrologica
 ```
 
 ## Usage
@@ -37,5 +37,5 @@ The skill tells Hermes how to import and use the astrologica Python library.
 
 ## Related
 
-- [astrologica engine](https://github.com/gergeisabo/astrologica) — the computation library
+- [astrologica engine](https://github.com/gergeisabo/sweph-astrology) — the computation library
 - [Swiss Ephemeris](https://www.astro.com/swisseph/swephinfo_e.htm) — the astronomical engine underneath
