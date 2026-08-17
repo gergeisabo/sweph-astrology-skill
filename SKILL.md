@@ -43,6 +43,40 @@ houses = compute_houses(birth)  # .cusps, .ascendant, .mc, .house_of(lon)
 #   .sign (0-11), .degree_in_sign, .sign_name (property), .dms() method
 ```
 
+## Returned Dict Keys
+
+`compute_positions()` returns exactly these 14 keys:
+
+```
+Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn,
+Uranus, Neptune, Pluto, Rahu, Ketu, Chiron, Lilith
+```
+
+**Critical naming:**
+- `Rahu` = North Node (NOT "North Node")
+- `Ketu` = South Node (NOT "South Node") — computed as opposite of Rahu, not in PLANETS dict but added by compute_positions
+- `Lilith` = Mean Black Moon Lilith (swe body 12)
+- `Chiron` = centaur Chiron (swe body 15)
+
+**NEVER hardcode a planet name list.** Always iterate `pos.items()`:
+
+```python
+# CORRECT — works regardless of which keys exist
+for name, p in pos.items():
+    house = houses.house_of(p.longitude)
+    retro = " Rx" if p.retrograde else ""
+    print(f"{name:12s}: {p.sign_name} {p.degree_in_sign:.2f}{retro}  House {house}")
+
+# WRONG — will silently skip Rahu/Ketu/Chiron/Lilith if names don't match
+planet_order = ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn',
+                'Uranus','Neptune','Pluto','North Node']  # ← WRONG KEY NAMES
+for name in planet_order:
+    if name in pos:  # silently fails for North Node
+        ...
+```
+
+**House assignment:** ALWAYS use `houses.house_of(planet.longitude)`. Never eyeball from cusp degrees — cusp boundaries are non-uniform in Placidus and visual estimation produces off-by-one house errors.
+
 ## Module Map
 
 | Module | Functions | Use For |
@@ -55,7 +89,7 @@ houses = compute_houses(birth)  # .cusps, .ascendant, .mc, .house_of(lon)
 | `vedic.py` | nakshatra, vimshottari_dasha, ashtottari_dasha, panchang, varga_chart, yogas, doshas, vedic_chart | Vedic (Jyotish) astrology |
 | `vedic_ext.py` | ashtakoota, dashakoota, muhurat_scan, ashtakavarga_bav, sav | Vedic compatibility, muhurat, ashtakavarga |
 | `bazi.py` | four_pillars, day_master, ten_gods, luck_pillars, element_balance | Chinese Four Pillars |
-| `hd.py` | compute (→ HumanDesignChart), gate_at_longitude | Human Design |
+| `hd.py` | compute (→ HumanDesignChart), gate_at_longitude | Human Design (incl. Rave Variables: determination, environment, motivation, perspective, sense, cognition) |
 | `hd_ext.py` | hd_transits, hd_compatibility, incarnation_cross, hd_circuitry, design_date | Extended Human Design |
 | `ziwei.py` | ziwei_chart | Zi Wei Dou Shu (Purple Star) |
 | `destiny.py` | compute_destiny | Destiny Matrix (Ladini) |
@@ -90,6 +124,70 @@ Birth data: 1991-02-15 18:45 CET, Kisvárda (48.2264°N, 22.0847°E)
 - swe.rise_trans geopos: [lon, lat, alt] — NOT [lat, lon, alt]
 - swe.fixstar_ut: needs ephe/sefstars.txt file (downloaded from aloistr/swisseph GitHub)
 - BaZi formulas: month1_stem = ((year_stem % 5) * 2 + 2) % 10; zi_stem = ((day_stem % 5) * 2 + 2) % 10
+
+## Function Signature Notes
+
+These functions have non-obvious signatures — check before calling:
+
+| Function | Signature | Notes |
+|----------|-----------|-------|
+| `vimshottari_dasha` | `(birth, moon_longitude)` | Requires explicit sidereal Moon longitude as 2nd arg |
+| `hermetic_lots` | `(pos, houses, is_day)` | `is_day` bool required (Sun below horizon = False) |
+| `zodiacal_releasing_from_fortune` | `(pos, houses, is_day)` | Same `is_day` requirement |
+| `moon_phase` | `(birth)` | Takes BirthData, NOT pos dict |
+| `element_balance` | `(pos)` | Takes pos dict, NOT BirthData |
+| `nakshatra` | `(longitude)` | Single float longitude; returns dict with keys: number, name, pada, ruler, deity, degree_in_nakshatra |
+
+**Day/Night determination:** Sun below the ASC-DSC axis (houses 1-6 in a day chart = houses 7-12) means night chart. In Placidus: if Sun's house is 7-12 → day chart; houses 1-6 → night chart. For this birth: Sun in House 6 = night chart → `is_day=False`.
+
+## Mandatory Output Checklist
+
+When generating a natal chart reading, EVERY item below MUST appear in the output. No omissions, no shortcuts. Use `pos.items()` and `houses.house_of()` for all calculations — never hardcode or eyeball.
+
+### Planetary Positions Table (all 14 points + ASC/MC)
+
+```
+ASC, MC, Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn,
+Uranus, Neptune, Pluto, Rahu (North Node), Ketu (South Node),
+Chiron, Lilith, Lot of Fortune, Vertex
+```
+
+For each point display: **sign, degree, retrograde marker (Rx or nothing), house number**.
+
+- Retrograde: check `.retrograde` on every PlanetPosition — do NOT assume only outer planets go Rx. Nodes (Rahu/Ketu) and Chiron are frequently retrograde.
+- House: always `houses.house_of(p.longitude)` — never estimate from cusp degrees.
+- Fortune: compute via `hermetic_lots(pos, houses, is_day)` — requires day/night determination.
+- Vertex: compute via `swe.houses(jd, lat, lon, b'P')` — it's in `ascmc[3]`.
+
+### Additional mandatory sections
+- Aspects (with orb and applying/separating)
+- Element/Mode balance
+- House cusps (all 12)
+
+## Human Design Variables
+
+The `compute()` function returns a `HumanDesignChart` with these Variable fields:
+
+| Variable | Source | Field |
+|---|---|---|
+| Determination (Digestion) | Design Sun Color | `determination_color` |
+| Environment | Design Nodes Color | `environment_color` |
+| Motivation | Personality Sun Color | `motivation_color` |
+| Perspective | Personality Nodes Color | `perspective_color` |
+| Sense | Personality Sun Tone | `sense_tone` |
+| Cognition | Design Sun Tone | `cognition_tone` |
+
+**Critical: Nodes must use TRUE NODE** (not Mean Node) for Environment and Perspective.
+
+**Determination/Environment variant** (Active/Passive): Tones 1-3 = Left/Active, Tones 4-6 = Right/Passive. Use `determination_tone` and `environment_tone` for this.
+
+**Mapping dictionaries** (official IHDS/Jovian Archive names):
+- Determination Colors: Appetite(1), Taste(2), Thirst(3), Touch(4), Sound(5), Light(6)
+- Environment Colors: Caves(1), Markets(2), Kitchens(3), Mountains(4), Valleys(5), Shores(6)
+- Motivation Colors: Fear(1), Hope(2), Desire(3), Need(4), Guilt(5), Innocence(6)
+- Perspective Colors: Survival(1), Possibility(2), Power(3), Wanting(4), Probability(5), Personal(6)
+- Sense Tones: Security(1), Uncertainty(2), Action(3), Meditation(4), Judgment(5), Acceptance(6)
+- Cognition Tones: Smell(1), Taste(2), Outer Vision(3), Inner Vision(4), Feeling(5), Touch(6)
 
 ## Running
 
