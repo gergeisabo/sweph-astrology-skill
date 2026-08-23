@@ -87,11 +87,11 @@ for name in planet_order:
 | `timing.py` | profections, firdaria, tertiary/minor_progressions, symbolic/primary_directions, lunar/solar/planetary_return, ingresses, retrograde_periods, eclipses, transit_calendar, forecast_calendar | Predictive timing |
 | `astrogeo.py` | acg_lines, local_space_lines, geodetic_chart, parans, relocation_chart | Astrocartography & relocation |
 | `vedic.py` | nakshatra, vimshottari_dasha, ashtottari_dasha, panchang, varga_chart, yogas, doshas, vedic_chart | Vedic (Jyotish) astrology |
-| `vedic_ext.py` | ashtakoota, dashakoota, muhurat_scan, ashtakavarga_bav, sav | Vedic compatibility, muhurat, ashtakavarga |
+| `vedic_ext.py` | ashtakoota, dashakoota, muhurat_scan, ashtakavarga_bav, sav | Vedic compatibility, muhurat, ashtakavarga (full Parasara BAV; pass houses= for Lagna; SAV=337) |
 | `bazi.py` | four_pillars, day_master, ten_gods, luck_pillars, element_balance | Chinese Four Pillars |
 | `hd.py` | compute (→ HumanDesignChart), gate_at_longitude | Human Design (incl. Rave Variables: determination, environment, motivation, perspective, sense, cognition) |
 | `hd_ext.py` | hd_transits, hd_compatibility, incarnation_cross, hd_circuitry, design_date | Extended Human Design |
-| `ziwei.py` | ziwei_chart | Zi Wei Dou Shu (Purple Star) |
+| `ziwei.py` | ziwei_chart | Zi Wei Dou Shu: 14 main + 16 minor stars, year-stem sihua (Lu/Quan/Ke/Ji). Lunar month/day/hour. |
 | `destiny.py` | compute_destiny | Destiny Matrix (Ladini) |
 | `mayan.py` | tzolkin, haab, long_count, dreamspell | Mayan calendar |
 | `numerology.py` | pythagorean, chaldean, kabbalistic, vedic | Numerology systems |
@@ -115,7 +115,7 @@ Birth data: 1991-02-15 18:45 CET, Kisvárda (48.2264°N, 22.0847°E)
 - Sidereal Moon: Aquarius ~14.71°
 - Tropical ASC: Virgo ~17.95°
 - Ayanamsa Lahiri 1991-02-15: ~23.7331°
-- 146 core tests + 115 extension tests = 261 total (all green)
+- 146 core tests + 129 extension tests = 275 total (all green)
 
 ## Pitfalls
 
