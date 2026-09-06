@@ -7,7 +7,7 @@ metadata:
   hermes:
     tags: [astrology, hub, engine, positions, houses, cli]
     category: astrology
-    related_skills: [western-astrology, vedic-astrology, bazi, human-design, ziwei, mayan, numerology, divination, esoteric-computation, astrology-readings]
+    related_skills: [western-astrology, vedic-astrology, bazi, human-design, ziwei, mayan, numerology, divination, destiny-matrix, astrology-readings]
 ---
 
 # Astrologica — Shared Hub
@@ -28,7 +28,7 @@ For any specific system, load its dedicated skill — do NOT mix systems here.
 | Mayan tzolkin/haab/long count/dreamspell | `mayan` | `astro mayan` |
 | Life path / name numbers | `numerology` | `astro numerology` |
 | Tarot, I Ching, runes, geomancy | `divination` | (no CLI) |
-| Destiny Matrix (Ladini) chakras | `esoteric-computation` | (no CLI) |
+| Destiny Matrix (Ladini) chakras | `destiny-matrix` | (no CLI) |
 | **Multi-system reading synthesis** | `astrology-readings` | — |
 
 Load the routed skill for details, gold data, and pitfalls. This hub only gives the
@@ -115,7 +115,7 @@ Engine modules at `~/Projects/astrologica/astrologica/`:
 `vedic.py vedic_ext.py` → **vedic-astrology**
 `bazi.py` → **bazi** · `hd.py hd_ext.py` → **human-design** · `ziwei.py` → **ziwei**
 `mayan.py` → **mayan** · `numerology.py` → **numerology** · `divination.py` → **divination**
-`destiny.py` (simple grid) → see **esoteric-computation** (Ladini is authoritative, not `destiny.py`)
+`destiny.py` (simple grid) → see **destiny-matrix** (Ladini is authoritative, not `destiny.py`)
 
 ## Mandatory Output Rule (all natal systems)
 

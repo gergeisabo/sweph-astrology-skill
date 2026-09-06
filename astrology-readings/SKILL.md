@@ -8,12 +8,12 @@ metadata:
   hermes:
     tags: [astrology, natal, synthesis, wealth, human-design, bazi]
     category: astrology
-    related_skills: [astrologica, esoteric-computation]
+    related_skills: [astrologica, destiny-matrix]
 ---
 
 # Astrology readings (local engine)
 
-Compute with `astrologica` (`~/Projects/astrologica/.venv/bin/astro` CLI, or the Python API). Ladini chakras with `esoteric-computation`. Then **synthesize the intersection**, not a dump of every system.
+Compute with `astrologica` (`~/Projects/astrologica/.venv/bin/astro` CLI, or the Python API). Ladini chakras with `destiny-matrix`. Then **synthesize the intersection**, not a dump of every system.
 
 `astrologica` SKILL.md was reconciled with the code on 2026-09-06 (CLI, correct APIs, 276 tests). The traps below are still worth reading.
 
@@ -48,7 +48,7 @@ wh = compute_houses(birth, system="whole_sign", sidereal=True)  # REQUIRED
 - Numerology: `full_profile(name, date_str)` — there is no `pythagorean()`.
 - Night chart for this natal (`is_day=False`) for lots/ZR.
 - HD: `from astrologica.hd import compute as hd_compute`. Gold PDF = engine: **Projector**, wait for invitation, Self-Projected, 3/5, channels 7–31 and 1–8, Cross of Contagion 1 (30/29|14/8).
-- Destiny Matrix: **esoteric-computation**, not `astrologica.destiny.compute()`. Numbers: skill_view `esoteric-computation` file `references/verified-1991-02-15-chakras.md`.
+- Destiny Matrix: **destiny-matrix**, not `astrologica.destiny.compute()`. Numbers: skill_view `destiny-matrix` file `references/verified-1991-02-15-chakras.md`.
 - BaZi pillars gold: Xin Wei / Geng Yin / **Bing Chen** / Ding You. Day Master **Bing Fire**. Hour Ding = Jie Cai on You Direct Wealth.
 - `ten_gods()` inverts Direct/Indirect for wealth/resource/output/power. Recompute with standard polarity (Direct = opposite yin/yang except companion: same = Bi Jian, opposite = Jie Cai).
 - Luck pillars `luck_pillars(birth, "male")`. Age 35 = Bing Xu (~33.7–43.7), not the old vault Ding-Hai table.

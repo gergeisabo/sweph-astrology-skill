@@ -1,16 +1,17 @@
 ---
-name: esoteric-computation
-description: "Use when computing destiny matrix chakras or arcana math."
-version: 1.0.0
+name: destiny-matrix
+description: "Use when computing the Destiny Matrix (Матрица судьбы / Ladini) chakra table, karmic tail, or arcana math. Authoritative formulas; note the engine's destiny.py is a different simpler grid."
+version: 2.0.0
 author: Hermes Agent
 license: MIT
 metadata:
   hermes:
-    tags: [numerology, destiny-matrix, tarot, esoteric, chakra, ladini]
+    tags: [numerology, destiny-matrix, ladini, arcana, chakra, karmic-tail]
     category: astrology
+    related_skills: [astrologica, numerology]
 ---
 
-# Esoteric Computation — Formula Reference
+# Destiny Matrix (Ladini) — Formula Reference
 
 Pure-math computation for esoteric/numerological systems. No API calls. Use alongside `astrologica` which handles astronomical calculations.
 

@@ -7,7 +7,7 @@ metadata:
   hermes:
     tags: [astrology, numerology, life-path, soul-urge, chaldean, kabbalistic, vedic]
     category: astrology
-    related_skills: [astrologica, esoteric-computation]
+    related_skills: [astrologica, destiny-matrix]
 ---
 
 # Numerology — `astrologica.numerology`
@@ -55,7 +55,7 @@ soul_urge 11 in all three; personality — 8 / 6 / 8.
 
 ## Cross-reference
 
-Destiny Matrix (Ladini) numerology lives in the separate **esoteric-computation** skill —
+Destiny Matrix (Ladini) numerology lives in the separate **destiny-matrix** skill —
 do not duplicate it here.
 
 ## CLI
