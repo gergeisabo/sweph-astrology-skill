@@ -55,10 +55,10 @@ ALWAYS treat Earth as activated.
   index +32 (correct method).
 - `hd_circuitry(birth)` — Individual/Tribal/Collective gate counts +
   `dominant_circuit` (gold: Individual 19, Collective 17, Tribal 3).
-- `design_date(birth)` — APPROXIMATE: `jd - 88` calendar days → gold
-  1990-11-19 17:45. The precise design instant is `hd._get_design_date(birth)`
-  → gold **1990-11-21 03:07:40 UTC**. Prefer the precise one; the ext version
-  can be ~2 days off.
+- `design_date(birth)` — PRECISE: uses `hd._get_design_date`
+  (`swe.solcross_ut` on natal Sun longitude − 88°) → gold **1990-11-21
+  03:07:40 UTC**. Returns `design_date`, `design_time` and
+  `days_before_birth` (~86.6, not 88 — the Sun's arc is not exactly 1°/day).
 - `penta(charts)` — group bodygraph for a **list of 3–5** `BirthData`
   (raises `ValueError` otherwise). Returns `group_defined_centers` /
   `group_defined_channels` (UNION across members, channels normalised to
@@ -84,30 +84,41 @@ ALWAYS treat Earth as activated.
 
 ## Rave Variables (sub-structure)
 
-| Variable     | Source                        | Gold (engine) |
-|--------------|-------------------------------|---------------|
-| Determination| Design Sun Color (+Tone=variant) | color 2, tone 6 |
-| Environment  | Design Nodes Color (TRUE NODE)| color 4, tone 3 |
-| Motivation   | Personality Sun Color         | color 2       |
-| Perspective  | Personality Nodes Color (TRUE NODE) | color 4  |
-| Sense        | Personality Sun Tone          | tone 1        |
-| Cognition    | Design Sun Tone               | tone 6        |
+Six Variables, computed from Color/Tone within the gate. Sources:
 
-Colors/Tones are 1–6. TRUE NODE (swe.TRUE_NODE) is required for
-Environment/Perspective — mean node shifts the gate/color.
+| Variable     | Source                        |
+|--------------|-------------------------------|
+| Determination| Design Sun Color (+Tone → Left/Right qualifier) |
+| Environment  | Design True-Node Color (+Tone → Left/Right qualifier) |
+| Motivation   | Personality Sun Color         |
+| Perspective  | Personality True-Node Color   |
+| Sense        | Personality Sun Tone          |
+| Cognition    | Design Sun Tone               |
 
-**KNOWN LIMITATION (from history, document in readings):** Design-derived
-Variables (Determination / Sense / Environment / Perspective) can be off by
-1–3 color/tone indices vs reference calculators — engine sub-structure
-precision issue (color = 0.15625°, tone = 0.02604°; tiny ephemeris/design-date
-error flips them). State them as approximate; Personality-derived
-(Motivation) is more stable. Map color/tone via standard IHDS tables when
-naming (e.g. Motivation colors 1–6: Fear/Hope/Desire/Need/Guilt/Innocence;
-Determination 1–6: Appetite/Taste/Thirst/Touch/Sound/Light; Environment
-1–6: Caves/Markets/Kitchens/Mountains/Valleys/Shores; Perspective 1–6:
-Survival/Possibility/Power/Wanting/Probability/Personal; Sense tones and
-Cognition tones 1–6: Smell/Taste/Outer vision/Inner vision/Feeling/Touch and
-Touch/Vision/Taste/Smell/Feeling/Listening respectively per IHDS naming).
+Color/Tone are 1–6 (Line > Color > Tone: 0.9375° / 0.15625° / 0.026041667°).
+TRUE NODE (`swe.TRUE_NODE`) is required for Environment/Perspective — the
+mean node shifts the color. Tone 1–3 = Left, 4–6 = Right (arrow direction).
+
+`hd.rave_variables(chart)` names all six via the IHDS maps. Gold birth
+(1991-02-15 18:45 Kisvárda) — VERIFIED against an independent reference:
+
+| Variable     | Gold name              | index                         |
+|--------------|------------------------|-------------------------------|
+| Determination| **Closed**             | color 2, tone 6 (Right)       |
+| Environment  | **Mountains Active**   | color 4, tone 3 (Left)        |
+| Motivation   | **Hope**               | color 2                       |
+| Perspective  | **Wanting**            | color 4                       |
+| Sense        | **Security**           | tone 1                        |
+| Cognition    | **Touch**              | tone 6                        |
+
+Naming maps (color 1–6): Determination
+Appetite/Taste/Thirst/Touch/Sound/Light, with directional qualifiers (Taste
+Left="Open", Right="Closed"); Environment
+Caves/Markets/Kitchens/Mountains/Valleys/Shores (Mountains Left="Active",
+Right="Passive"); Motivation Fear/Hope/Desire/Need/Guilt/Innocence;
+Perspective Survival/Possibility/Power/Wanting/Probability/Personal; Sense
+tones Security/Uncertainty/Action/Meditation/Judgment/Acceptance; Cognition
+tones Smell/Taste/Outer vision/Inner vision/Feeling/Touch.
 
 ## Notes
 

@@ -25,32 +25,44 @@ birth = BirthData("1991-02-15", "18:45:00", 48.2264, 22.0847,
 p = four_pillars(birth)
 ys, yb = p["year"]["stem_index"], p["year"]["branch_index"]      # 7, 7 = Xin Wei
 hour_branch = p["hour"]["branch_index"]                          # 9 = You
+from astrologica.lunar import solar_to_lunar
+lunar_month, leap, lunar_day = solar_to_lunar(birth)              # (1, False, 1)
 chart = ziwei_chart(ys, yb, lunar_month, lunar_day, hour_branch)
 ```
 
 ## ziwei_chart signature (from source)
 
 `ziwei_chart(year_stem: int, year_branch: int, month: int, day: int,
-hour_branch: int) -> ZWPResult` — ALL ints/indices (Zi=0 … Hai=11;
-Jia=0 … Gui=9). `month`/`day` are **LUNAR** month/day, NOT solar.
-`ZWPResult`: `birth_branch, life_palace, body_palace, palaces
-(dict branch_idx→palace name), star_placements (dict star→branch_idx),
-element, bureau, sihua`.
+hour_branch: int, sihua_kind: str = "year_stem", month_stem: int | None = None,
+day_stem: int | None = None, hour_stem: int | None = None) -> ZWPResult` —
+ALL ints/indices (Zi=0 … Hai=11; Jia=0 … Gui=9). `month`/`day` are **LUNAR**
+month/day, NOT solar. `ZWPResult`: `birth_branch, life_palace, body_palace,
+palaces (dict branch_idx→palace name), star_placements (dict star→branch_idx),
+element, bureau, sihua, sihua_all`.
 
-## Solar→lunar conversion (as implemented in cli.py `cmd_ziwei`)
+## Solar→lunar conversion — `astrologica.lunar.solar_to_lunar`
 
-Uses Swiss Ephemeris (`new_moon_before`): walk back from target JD in 0.25-day
-steps until sun–moon elongation wraps 360→0, then bisect (40 iterations).
-- `target_jd = swe.julday(year, month, day, 12.0)` (noon UT).
-- **Lunar day** = `int((target_jd - new_moon_before(target_jd + 0.01)) // 1) + 1`
-  (days since last new moon + 1).
-- **Lunar month** = new moons since the new moon in the **Jan 20–Feb 20
-  window** (Chinese New Year rule): `round((nm_at_birth - first_nm)/29.530588)+1`,
-  +12 if negative. If no window new moon found, falls back to solar month −1
-  with a "(month approximate)" note.
-- Gold: 1991-02-15 → last new moon 1991-02-14 (JD 2448302.23, also the
-  CYY-window new moon) → **lunar M1 D1** — correct because the birth WAS
-  Chinese New Year day 1991.
+`from astrologica.lunar import solar_to_lunar`
+`solar_to_lunar(birth) -> (month, leap_month, day)` — the CORRECT Chinese
+lunisolar calendar (leap months + civil-day day reckoning); `cli.py cmd_ziwei`
+uses it. Algorithm:
+
+- Month boundaries = new-moon instants (Moon–Sun elongation 0 via Swiss
+  Ephemeris), rounded to whole **China civil days** (Asia/Shanghai, UTC+8).
+- Month 11 = the month containing the winter solstice (Sun longitude 270°,
+  `swe.solcross_ut`).
+- Principal solar terms (中气) = Sun crossing multiples of 30°:
+  270, 300, 330, 0, …, 240 (12 terms, via `swe.solcross_ut`), rounded to China
+  days. A month whose day-range contains NO 中气 is a **leap month** (repeats
+  the previous month number, `leap=True`).
+- Lunar day 1 = the China civil day containing the month's new moon;
+  `day = (birth.date − new_moon_day).days + 1`.
+
+The calendar is China-anchored (fixed worldwide): Chinese New Year 1991 was
+15 Feb even though the new moon fell 14 Feb in European timezones.
+- Gold 1991-02-15 → **lunar M1 D1, leap=False**.
+- Leap example: 2023-04-01 → M2 leap=True (2023 had 闰二月, 03-22…04-19);
+  2025-07-25 → M6 leap=True (闰六月).
 
 ## Gold chart (verified live: `ziwei_chart(7, 7, 1, 1, 9)`)
 
@@ -68,15 +80,35 @@ steps until sun–moon elongation wraps 360→0, then bisect (40 iterations).
   Qing Yang+You Bi Xu · Tan Lang Hai · Tian Ji+Ju Men Zi · Tian Kui+
   Huo Xing Wu.
 
-## Caveats
+## Four Transformations (四化) — four stem-keyed systems
 
-- **Leap-month approximation**: lunar month is derived by counting new moons
-  since the CYY-window new moon; in years with a leap month the computed
-  month (and palace placement) can be off by one. The CLI prints a note when
-  approximate. Gold birth is unaffected.
-- Noon-UT target: for births soon after a late-UT new moon near midnight,
-  the lunar day can be off by one vs local-date reckoning.
-- 14 main stars + 16 minor stars placed; sihua is year-stem keyed only
-  (no palace/branch sihua variants).
-- Readings must NEVER omit detail: all 12 palaces, all star placements,
-  bureau, and all four sihua.
+Four Transformations are **stem-keyed by definition**: the single standard
+十天干四化表 (Ten-Stem table, per 《紫微斗数全书》) is indexed by whichever
+heavenly stem is in play. `ziwei_chart` exposes the four periods via
+`sihua_kind` — `"year_stem"` (default, 生年四化), `"month_stem"` (流月四化),
+`"day_stem"` (流日四化), `"hour_stem"` (流时四化). Pass the corresponding stem
+(`month_stem`/`day_stem`/`hour_stem`) for the non-year kinds. `result.sihua`
+holds the selected set; `result.sihua_all` holds every set whose stem is known.
+There is **no branch-keyed (地支) table** — year-branch is not a sihua axis.
+
+十天干四化表 (stem index 0=Jia … 9=Gui → Lu/Quan/Ke/Ji):
+
+| 干 | Lu 化禄 | Quan 化权 | Ke 化科 | Ji 化忌 |
+|---|---|---|---|---|
+| 甲 Jia 0 | Lian Zhen | Po Jun | Wu Qu | Tai Yang |
+| 乙 Yi 1 | Tian Ji | Tian Liang | Zi Wei | Tai Yin |
+| 丙 Bing 2 | Tian Tong | Tian Ji | Wen Chang | Lian Zhen |
+| 丁 Ding 3 | Tai Yin | Tian Tong | Tian Ji | Ju Men |
+| 戊 Wu 4 | Tan Lang | Tai Yin | You Bi | Tian Ji |
+| 己 Ji 5 | Wu Qu | Tan Lang | Tian Liang | Wen Qu |
+| 庚 Geng 6 | Tai Yang | Wu Qu | Tai Yin | Tian Tong |
+| 辛 Xin 7 | Ju Men | Tai Yang | Wen Qu | Wen Chang |
+| 壬 Ren 8 | Tian Liang | Zi Wei | Zuo Fu | Wu Qu |
+| 癸 Gui 9 | Po Jun | Ju Men | Tai Yin | Tan Lang |
+
+Gold birth pillars → gold sihua sets (each = `sihua_for_stem(stem)`):
+
+- **Year-stem** Xin 辛(7): Lu=Ju Men · Quan=Tai Yang · Ke=Wen Qu · Ji=Wen Chang.
+- **Month-stem** Geng 庚(6): Lu=Tai Yang · Quan=Wu Qu · Ke=Tai Yin · Ji=Tian Tong.
+- **Day-stem** Bing 丙(2): Lu=Tian Tong · Quan=Tian Ji · Ke=Wen Chang · Ji=Lian Zhen.
+- **Hour-stem** Ding 丁(3): Lu=Tai Yin · Quan=Tian Tong · Ke=Tian Ji · Ji=Ju Men.

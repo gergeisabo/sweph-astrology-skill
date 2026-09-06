@@ -168,3 +168,15 @@ it as correct; correct those tests to the standard rule, don't preserve them.
 (Example: ten_gods() returned Direct on SAME polarity for all non-companion relations;
 two tests asserted the inverted names and were fixed alongside the one-line engine
 change.)
+
+## 13. Verify after a parallel subagent fan-out on a shared repo
+
+When extending the engine by dispatching several subagents in parallel against the SAME
+git repo, never trust any child's final "N tests green" as the tree's state — parallel
+children interleave commits and can leave a transiently-broken tree (test-count drift, a
+failure from another agent's half-finished work) that only resolves once the last child
+finishes. After the batch, run `.venv/bin/python -m pytest tests/ -q` and `git status`
+yourself, re-smoke-test each new function's claimed gold value, and `git push` (children
+commit but do not always push — `git status -sb` shows the ahead count). Give each child
+one independent invariant/oracle check (e.g. SAV total = 337; Sun-in-Leo sthana bala >
+Sun-in-Aquarius; solar arc ≈ 1°/year) so wrong OUTPUT is caught, not just wrong code.

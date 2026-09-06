@@ -57,9 +57,26 @@ lagna_sign = int(ws.ascendant // 30)   # 0-11, needed by yogas()
 ```python
 from astrologica.vedic_ext import ashtakoota, muhurat_scan, ashtakavarga_bav, sav
 
-ashtakoota(moon_nak1, moon_nak2)   # nakshatra NUMBERS (0-26), e.g. (24, 10)
+ashtakoota(moon_nak1, moon_nak2)   # nakshatra NUMBERS (0-26); n1 = bride/girl, n2 = groom/boy
 #   {total, max: 36, varna, vashya, tara, yoni, graha_maitri, gana, bhakoot, nadi,
 #    person1_nakshatra, person2_nakshatra, verdict}
+
+**Standard Guna Milan tables (no simplifications).**  Varna, Vashya, Graha
+Maitri and Bhakoot are keyed to the **Moon sign** (each nakshatra's *principal*
+rashi = sign of its first pada, `(n*4)//9`); Tara, Yoni, Gana and Nadi are
+keyed to the nakshatra.  Varna (groom ≥ bride) and Vashya (bride × groom
+matrix) are directional.  Point tables:
+
+| Koota | Max | Rule |
+|---|---|---|
+| Varna | 1 | groom's varna ≥ bride's (Brahmin>Kshatriya>Vaishya>Shudra) |
+| Vashya | 2 | 5-type matrix (Chatushpad/Jalachar/Vanchar/Keet/Dwipad) |
+| Tara | 3 | bidirectional mod-9; Vipat(3)/Pratyari(5)/Vadha(7) malefic |
+| Yoni | 4 | 14-animal matrix (4 same / 3 friend / 2 neutral / 1 / 0 enemy) |
+| Graha Maitri | 5 | Moon-sign lords' natural friendship (5 same/friends, 4 f+n, 3 n+n, 1 f+e, 0.5 n+e, 0 e+e) |
+| Gana | 6 | Deva/Manushya/Rakshasa (6 same, 5 D+M, 1 D+R, 0 M+R) |
+| Bhakoot | 7 | sign distance: good 1/1, 1/7, 3/11, 4/10; bad 2/12, 5/9, 6/8 |
+| Nadi | 8 | 3 nadis; different = 8, same = 0 (nadi dosha) |
 
 muhurat_scan(birth, "marriage", "2026-06-01", "2026-06-30",
              place_lat=48.2264, place_lon=22.0847)
@@ -101,7 +118,7 @@ Chara karakas rank planets by **degree within sign** (highest = Atmakaraka). Rah
 lal_kitab_dasha(birth)   # 7 dicts {lord, start_date, end_date, duration_years=5}
 ```
 
-35-year cycle (Saturn→Jupiter→Mars→Sun→Venus→Mercury→Moon, 5y each), starting from the weekday lord. Simplified progression table — document as such.
+35-year cycle (Saturn→Jupiter→Mars→Sun→Venus→Mercury→Moon, 5y each), starting from the birth weekday's ruler — the standard Lal Kitab graha dasha.
 
 ## Shadbala (shadbala.py)
 
@@ -115,7 +132,7 @@ sb = shadbala(birth, sid, ws)   # positions + houses optional (auto-computed)
 
 Six-fold strength per B.V. Raman: Sthana, Dig, Kala, Cheshta, Naisargika, Drik — each in virupas (1/60 rupa). `total_rupas = total_virupas / 60`. Only the 7 classical planets are scored (no Rahu/Ketu/outers).
 
-**Pitfalls:** (1) Naisargika bala is FIXED — Sun 60 > Moon 51.43 > Venus 42.86 > Jupiter 34.29 > Mercury 25.71 > Mars 17.14 > Saturn 8.57 (sums 240). (2) Saptavargaja uses natural friendship only (moolatrikona 45, own 30, mitra 15, sama 7.5, shatru 3.75) — NOT the compound five-fold friendship. (3) Ishta/Kashta = √(uccha·cheshta) and √((60−uccha)·(60−cheshta)).
+**Pitfalls:** (1) Naisargika bala is FIXED — Sun 60 > Moon 51.43 > Venus 42.86 > Jupiter 34.29 > Mercury 25.71 > Mars 17.14 > Saturn 8.57 (sums 240). (2) Saptavargaja uses natural friendship only (moolatrikona 45, own 30, mitra 15, sama 7.5, shatru 3.75) — NOT the compound five-fold friendship. (3) Ishta/Kashta = √(uccha·cheshta) and √((60−uccha)·(60−cheshta)). (4) **Kala bala uses ACTUAL sunrise/sunset** via `swe.rise_trans` (CALC_RISE/CALC_SET): Nathonnatha, Tribhaga and Hora all split the real day/night length — a hora is 1/12 of the day (sunrise→sunset) or 1/12 of the night (sunset→sunrise), NOT a fixed clock hour. The vara (weekday) is anchored at sunrise, so a pre-dawn birth belongs to the previous day's vara. Gold birth (18:45 night) → hora lord **Sun**.
 
 ## CLI
 
@@ -136,7 +153,8 @@ cd ~/Projects/astrologica
 - varga D9: Sun Libra, Moon Aquarius · D3: Moon Gemini
 - yogas: 1 — Budhaditya Yoga · doshas: [] (none)
 - panchang: tithi 1 Pratipada (Shukla), nakshatra Shatabhisha p3, plus yoga/karana/vara
-- ashtakoota(24, 10): total 22.5/36, verdict 'Good match' (Shatabhisha × Purva Phalguni)
+- ashtakoota(23, 10): total **20.5/36**, verdict 'Good match' (Shatabhisha × Purva Phalguni — gold Moon Shatabhisha = index 23)
+- ashtakoota(7, 7): total **28/36** (Pushya × Pushya — published reference; both Madhya nadi → nadi 0)
 - muhurat_scan marriage Jun-2026: 30 slots, first 2026-06-04 Thu score 25
 - SAV (houses=ws): {0:25, 1:35, 2:33, 3:22, 4:24, 5:26, 6:28, 7:36, 8:34, 9:24, 10:21, 11:29} — **total 337** ✓
 - Yogini (Moon Shatabhisha #24): first **Dhanya** (3y, balance 1.19y) → Bhramari → Bhadrika → Ulka → Siddha → Sankata → Mangala → Pingala
@@ -147,7 +165,7 @@ cd ~/Projects/astrologica
 - Jaimini aspect Aries(0) → [Leo 4, Scorpio 7, Aquarius 10]; Taurus(1) → [Cancer 3, Libra 6, Capricorn 9]
 - Arudha AL (house 1) → **Libra**
 - Lal Kitab: starts **Venus** (Friday), 7 × 5y → Mercury, Moon, Saturn, Jupiter, Mars, Sun
-- Shadbala rupas: Sun 9.61, Moon 9.24, Mars 6.67, Mercury 6.15, Jupiter 9.12, Venus 8.12, Saturn 8.19 · Ishta: Sun 49.56, Moon 51.22, Venus 52.36 · Kashta: Mars 13.28 (only planet with kashta > 0)
+- Shadbala rupas: Sun 9.21, Moon 8.91, Mars 6.33, Mercury 6.15, Jupiter 8.72, Venus 7.73, Saturn 7.85 · Ishta: Sun 49.56, Moon 51.22, Venus 52.36 · Kashta: Mars 13.28 (only planet with kashta > 0)
 - Shadbala invariant: Sun in Leo sthana 262.08 > Sun in Aquarius 247.92
 - Varga D2 (Hora) fixed: odd sign 0-15°→Leo, 15-30°→Cancer; even reversed · D30 (Trimsamsa) 5 unequal parts (Mars/Saturn/Jupiter/Mercury/Venus)
 

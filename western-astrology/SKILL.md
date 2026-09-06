@@ -62,6 +62,9 @@ houses = compute_houses(birth)          # Placidus; .house_of(lon) is the ONLY h
 | `ingresses("Jupiter", "2026-01-01", "2026-12-31")` | planet + range | list `{date_utc, planet, from_sign, to_sign}` |
 | `transit_calendar(birth, 2026, 3, major_orb=3.0)` | year+month | per-day list `{date, aspects: [{transit, natal, aspect, orb, applying}]}` |
 | `solar_arc(birth, target_age)` | Naibod key (~0.9856°/yr) | `{type, key, target_age, arc_degrees, arc_per_year, directed_positions}` — natal+age×arc. Distinct from `symbolic_directions` (exact 1°/yr) |
+| `primary_directions(birth, target_age)` | Placidus semi-arc | `{type, method, target_age, directed_asc, directed_asc_sign, directed_mc, directed_mc_sign}` — MC directed 1° RA/yr (Ptolemy); ASC via oblique ascension |
+| `primary_direction(birth, "Sun", "MC")` | Placidus semi-arc | `{arc_degrees, directed_age, directed_date_utc, promissor_ra, promissor_declination, ramc, ascensional_difference, diurnal_semi_arc, nocturnal_semi_arc, meridian_distance, proportional_part}` — arc = (RAMC − RA) mod 360; Ptolemy key 1° RA = 1 year |
+| `ascensional_difference(decl, lat)` / `semi_arcs(decl, lat)` | spherical trig | AD = asin(tan δ · tan φ); DSA = 90°+AD, NSA = 90°−AD |
 
 ## Horary & Electional (horary.py)
 
@@ -75,10 +78,16 @@ horary.horary_chart(question, moment, place)
 #   moment: tz-aware datetime OR BirthData. Returns:
 #   {question, moment_utc, ascendant, ascendant_longitude,
 #    querent: {lord, sign, dignity}, quesited: {lord, sign, dignity},
-#    moon: {sign, degree_in_sign, void_of_course, aspects},
-#    significator_aspects, verdict}
+#    moon: {sign, degree_in_sign, void_of_course, aspects, next_aspect},
+#    significator_aspects, receptions, antiscia, verdict}
 #   L1 = ruler of Asc, L7 = ruler of 7th (quesited); Moon = co-significator.
-#   verdict heuristic: applying L1-L7 aspect -> yes; separating -> no; VOC -> no.
+#   verdict weighs several testimonies (not just one aspect test):
+#     +2 applying L1-L7 aspect, -1 separating; +3 mutual reception between
+#     significators, +1 reception by sign; +1 Moon's next aspect to a
+#     significator; +1 antiscion contact; -2 Moon void-of-course.
+#   receptions: [{type: mutual_reception|reception, ...}] (traditional
+#     domicile, 7 planets). antiscia: antiscion-of-one-significator falls on
+#     the other (3° orb). next_aspect: Moon's next applying major aspect.
 
 horary.electional_scan(activity, from_date, to_date, place, hour=12)
 #   activity in: marriage, business, money, surgery, travel, house, study, general
@@ -97,13 +106,25 @@ acg_lines(birth, planets=["Sun","Moon"], step_deg=2.0)
 relocation_chart(birth, target_lat=51.5074, target_lon=-0.1278)
 #   keys: asc_sign, ascendant, houses, mc, mc_sign, positions, original/relocation_location
 
-from astrologica.hellenistic import hermetic_lots, zodiacal_releasing_from_fortune
+from astrologica.hellenistic import (hermetic_lots, zodiacal_releasing_from_fortune,
+    zodiacal_releasing_lot)
 is_day = houses.house_of(pos["Sun"].longitude) in {7,8,9,10,11,12}   # REQUIRED bool
 hermetic_lots(pos, houses, is_day)      # {Fortune, Spirit, Eros, Necessity, Courage, Victory}
-zodiacal_releasing_from_fortune(pos, houses, is_day, max_level=2)    # [{level, sign, sign_index, start_year, end_year, ruler}]
+zodiacal_releasing_lot(pos, houses, is_day)   # (lot_name, lot_longitude, lot_sign) —
+    #   Spirit by day, Fortune by night (the sect light's lot).  Both = ASC+Sun−Moon.
+zodiacal_releasing_from_fortune(pos, houses, is_day, max_level=2)
+    #   list of 12 L1 dicts {level, sign, sign_index, start_year, end_year,
+    #   duration_years, ruler, sub_periods}.  Full ZR:
+    #   * L1 sign period = its domicile ruler's minor years — Mars 15, Venus 8,
+    #     Mercury 20, Moon 25, Sun 19, Jupiter 12, Saturn 27 (Capricorn) / 30
+    #     (Aquarius, the Valens adjustment).  Cycle = 211 years.
+    #   * L2 sub_periods run zodiacally from the L1 sign, minor-years in MONTHS,
+    #     with a Loosing of the Bond (sub_periods[i]["loosing_of_bond"]) in each
+    #     L1 sign whose period > ~17.58y (Leo/Virgo/Gemini/Cancer/Capricorn/
+    #     Aquarius): the sequence jumps to the opposite sign instead of repeating.
 ```
 
-**is_day is required by both hellenistic functions.** This gold birth: Sun in H6 → **night chart, `is_day=False`**. ZR starts from the sign of Fortune (Virgo/Venus, ages 0-9).
+**is_day is required by the hellenistic functions.** This gold birth: Sun in H6 → **night chart, `is_day=False`** → ZR releases from the Lot of **Fortune** (Virgo 6.05°). L1 = Virgo 0-20 (**Mercury**), not Venus.
 
 ## CLI
 
@@ -130,9 +151,10 @@ cd ~/Projects/astrologica
 - Jupiter ingress 2026: Cancer→Leo 2026-06-29 · transit_calendar Mar 2026: 31 days
 - acg Sun ASC line at lon -158.14 (Aquarius) · relocation to London: ASC 152.83° (Leo 2.83°)
 - hermetic_lots(night): Fortune 156.05, Spirit 179.85, Eros 356.00, Necessity 153.37, Courage 40.88, Victory 342.66
-- ZR L1: Virgo 0-9 (Venus), 12 periods listed
+- ZR (night, Fortune Virgo 6.05°): L1 Virgo 0-20 Mercury → Libra 8 → Scorpio 15 → Sagittarius 12 → Capricorn 27 → Aquarius 30 → Pisces 12 → Aries 15 → Taurus 8 → Gemini 20 → Cancer 25 → Leo 19 (cycle 211y). LB (→ opposite sign) in Virgo→Pisces, Capricorn→Cancer, Aquarius→Leo, Gemini→Sagittarius, Cancer→Capricorn, Leo→Aquarius
 - solar_arc(1): arc 0.985647° (Naibod) · solar_arc(88): 86.737° ≈ HD's 88° offset
-- horary 2026-03-15 14:30 UTC Budapest: ASC Virgo 150.33°, L1 Mercury (Virgo Detriment), L7 Jupiter (Pisces Exalted), Moon Aquarius not-VOC
+- primary_direction(Sun→MC): arc 104.796° (age 104.8, ~2095-12). AD −14.576°, DSA 75.424°, NSA 104.576°, PP ≈ 1.00 (Sun near IC). RAMC = 73.567° (MC RA), Sun RA 328.771°
+- horary 2026-03-15 14:30 UTC Budapest: ASC Virgo 150.33°, L1 Mercury (Virgo Detriment), L7 Jupiter (Pisces Exalted), Moon Aquarius not-VOC · receptions include Mercury(L1) received by Jupiter(L7) · verdict "inconclusive (reception by sign … ; separating aspect …)"
 - electional marriage 2026-06-01..10 Budapest: 2 candidates, best 2026-06-07 (Pisces Moon)
 - sabian(0): Aries 1° · sabian(88): Gemini 29° · sabian(359): Pisces 30°
 
