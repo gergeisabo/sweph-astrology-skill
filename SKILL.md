@@ -138,7 +138,7 @@ Birth data: 1991-02-15 18:45 CET, Kisvárda (48.2264°N, 22.0847°E)
 - Sidereal Moon: Aquarius ~14.71°
 - Tropical ASC: Virgo ~17.95°
 - Ayanamsa Lahiri 1991-02-15: ~23.7331°
-- 276 tests total (all green)
+- 283 tests total (all green)
 
 ## Pitfalls
 
@@ -219,5 +219,5 @@ The `compute()` function returns a `HumanDesignChart` with these Variable fields
 
 ```bash
 cd ~/Projects/astrologica
-.venv/bin/python -m pytest tests/ -q  # expect 276 passed
+.venv/bin/python -m pytest tests/ -q  # expect 283 passed
 ```
