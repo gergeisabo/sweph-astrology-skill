@@ -120,6 +120,31 @@ lal_kitab_dasha(birth)   # 7 dicts {lord, start_date, end_date, duration_years=5
 
 35-year cycle (Saturn→Jupiter→Mars→Sun→Venus→Mercury→Moon, 5y each), starting from the birth weekday's ruler — the standard Lal Kitab graha dasha.
 
+## Vedic Transits — Gochara (`gochara.py`)
+
+Python-API only (no CLI subcommand yet). All positions sidereal (Lahiri).
+
+```python
+from astrologica.gochara import gochara, sade_sati, vedic_transit_report
+
+g = gochara(birth, "2026-09-06")        # or datetime(...), or "today" (default)
+# g['grahas'][name] = {transit_sign, transit_sign_index, degree_in_sign,
+#   house_from_moon, house_from_lagna, retrograde, favorable_from_moon}
+# g['natal_moon_sign'] (Janma Rashi), g['transit_moon_nakshatra']
+
+s = sade_sati(birth, "2026-09-06")
+# {active, phase 1|2|3, saturn_sign, house_from_moon,
+#  phases: {phase: {description, start, end_estimated}}}  dates from ephemeris
+
+r = vedic_transit_report(birth)          # gochara + sade_sati + SAV weighting
+# r['sav_weighting'][name] = {sav_bindus_in_transit_sign, sav_verdict}
+# classical 25-bindu rule: >25 auspicious, <25 challenging
+```
+
+**Benefic tables (favorable_from_moon)** — standard Gochara houses from natal Moon: Sun 3/6/10/11 · Moon 1/3/6/7/10/11 · Mars 3/6/11 · Mercury 2/4/6/8/10/11 · Jupiter 2/5/7/9/11 · Venus 1/2/3/4/5/8/9/11/12 · Saturn 3/6/11 · Rahu 3/6/10/11 · Ketu 3/6/11.
+
+**Gold (2026-09-06, Moon Kumbha/Aquarius):** Saturn sidereal Pisces (entered 2025-03-29), H2 from Moon, Rx — **Sade Sati phase 3 active** (setting phase, until ~2027-06-02). Phase 1 was 2022-07-12→2023-01-17 (Saturn's 2nd Capricorn pass), phase 2 while on Aquarius. Jupiter Cancer H6 (unfavorable). Transit Moon Ardra pada 2. Saturn's transit sign has 29 SAV bindus (auspicious).
+
 ## Shadbala (shadbala.py)
 
 ```python
