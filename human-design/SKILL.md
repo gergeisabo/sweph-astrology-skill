@@ -59,6 +59,28 @@ ALWAYS treat Earth as activated.
   1990-11-19 17:45. The precise design instant is `hd._get_design_date(birth)`
   → gold **1990-11-21 03:07:40 UTC**. Prefer the precise one; the ext version
   can be ~2 days off.
+- `penta(charts)` — group bodygraph for a **list of 3–5** `BirthData`
+  (raises `ValueError` otherwise). Returns `group_defined_centers` /
+  `group_defined_channels` (UNION across members, channels normalised to
+  `min-max`), `shared_gates` (INTERSECTION), `missing_gates` (1–64 minus
+  union), and `group_dynamics` (interpretive center→tag labels, NOT a formal
+  Penta/WA calc). Gold `penta([birth]*3)` → shared = all 22 gold gates,
+  centers {G, Throat}, channels ["1-8","7-31"].
+- `dream_rave(birth)` — Dream Rave core from the precise design instant
+  (`_get_design_date`): design Sun/Moon/Earth (Earth = Sun+180°). Returns
+  `dream_sun_gate`, `dream_moon_gate`, `dream_earth_gate`, `dream_gates`,
+  `dream_channels` (complete channels among the 3 gates — rarely non-empty),
+  `dream_centers` (centers TOUCHED by any dream gate, NOT full definition —
+  a simplification; the real Dream Rave uses all design positions).
+  Gold: Sun 14, Moon 58, Earth 8; channels []; centers {Root, Sacral, Throat}.
+- `hologenetic_profile(birth)` — Gene Keys / Laveena Archers Hologenetic
+  Profile, reduced to what the engine computes. Returns
+  `role_gate`/`role_line` (Personality Earth = Sun+180° — TRUE HD math),
+  `trajectory`/`trajectory_line` (Design Sun at design instant — TRUE HD
+  math), and `mode` (INTERPRETIVE: canonical HD line-archetype name of the
+  trajectory line — Investigator/Hermit/Martyr/Opportunist/Heretic/Role
+  Model). Gold: role_gate 29 (line 3), trajectory 14 (line 5), mode
+  **"Heretic"**.
 
 ## Rave Variables (sub-structure)
 

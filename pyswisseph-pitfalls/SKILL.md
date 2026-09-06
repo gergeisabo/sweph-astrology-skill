@@ -156,3 +156,15 @@ pyswisseph has no lunar-calendar converter. Working approach (used in sweph-astr
 ## 11. Entry-point scripts with uv venvs
 
 `uv`-created venvs have no `pip` — install a project's `[project.scripts]` entry point with `uv pip install -e . --python .venv/bin/python`. The console script then appears in `.venv/bin/`.
+
+## 12. Fix the engine, don't document a workaround — and check the tests
+
+When a live-verification pass (your own or a subagent's) finds a systematic wrong-value
+pattern in the engine, FIX the code rather than baking a "recompute it yourself"
+workaround into the skill. A workaround in a skill is a patch waiting to happen and
+rots when the bug is later fixed. Before fixing, grep the test tree for the SYMBOL —
+existing tests often encode the buggy convention and their docstrings may even assert
+it as correct; correct those tests to the standard rule, don't preserve them.
+(Example: ten_gods() returned Direct on SAME polarity for all non-companion relations;
+two tests asserted the inverted names and were fixed alongside the one-line engine
+change.)

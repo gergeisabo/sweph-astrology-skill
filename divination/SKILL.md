@@ -23,8 +23,8 @@ from astrologica import divination
 
 ## ⚠️ tarot_draw and runes_draw are GENERATORS
 
-Wrap in `list(...)` or you get a generator, not results. There is no `tarot_spread` or
-`tarot_daily` function — a "spread" is just `list(tarot_draw(n=3))` (position field 1..n).
+Wrap in `list(...)` or you get a generator, not results. For a *named* spread use
+`tarot_spread(name, seed=42)` (below) instead of hand-labelling `tarot_draw`.
 
 ## Functions — verified live
 
@@ -37,6 +37,7 @@ Wrap in `list(...)` or you get a generator, not results. There is no `tarot_spre
 | `list(divination.runes_draw(n=3, system='elder_futhark', seed=42))` | rune draw; sets: `elder_futhark` (24), `younger_futhark` (16), `anglo_saxon_futhorc` (33) |
 | `divination.geomancy_cast(seed=42)` | full chart: 4 mothers → daughters/nephews/witnesses/judge |
 | `divination.geomancy_lookup('fortuna major')` | figure facts by name (title-cased match; ValueError on unknown) |
+| `divination.tarot_spread('three_card', seed=42)` | named spread → `{spread, cards:[{..., meaning}]}`; names: `three_card` (Past/Present/Future), `celtic_cross` (10), `daily` (1), `relationship` (7). Hyphen/underscore interchangeable. ValueError on unknown |
 
 ## Gold draws — verified live (seed=42 unless noted)
 
@@ -44,6 +45,8 @@ Wrap in `list(...)` or you get a generator, not results. There is no `tarot_spre
 - iching: primary 42 Increase 益, resulting 1 The Creative, changing lines [2,4,5]
 - runes elder 3: Laguz upright, Ansuz reversed, Fehu reversed
 - geomancy: mothers [Puella, Populus, Laetitia, Populus], judge **Populus** (favorable)
+- tarot_spread three_card (seed=42): 3 cards, meanings Past/Present/Future (cards = same as tarot_draw(3))
+- tarot_spread celtic_cross (seed=42): 10 cards ending in Outcome; reproducible per seed
 
 ## Choosing a tool
 

@@ -1,6 +1,6 @@
 # Verified Ladini chakras — 15.02.1991
 
-Do **not** use `astrologica.destiny.compute("1991-02-15")` for this date. That function is a different grid (center Lovers, money Tower).
+`astrologica.destiny.compute("1991-02-15")` now returns this exact matrix (see engine `astrologica/destiny.py`).
 
 Formulas: A=day 15, B=month 2, C=year digit sum 20. Recursive reduce ≤22 (0→22).
 
@@ -25,5 +25,7 @@ Chakras Physics / Energy / Emotions:
 - Solar 11 / 11 / 22
 - Sacral 4 / 21 / 7
 - Root 20 / 10 / 3
+
+Result row: 10 / 15 / 16.
 
 Vault file `OLD/Astrology/Gergely - Asztrológiai elemzés 2026-06-26.md` put Devil at center and Death on the money line — **wrong formulas. Do not reuse.**

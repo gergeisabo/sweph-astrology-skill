@@ -111,11 +111,11 @@ Profiles live in `~/.config/astro/profiles.json`.
 
 Engine modules at `~/Projects/astrologica/astrologica/`:
 `core.py` (this hub) · `cli.py` (this hub) · `render.py` (SVG/markdown; see western-astrology)
-`western.py western_ext.py timing.py astrogeo.py hellenistic.py` → **western-astrology**
-`vedic.py vedic_ext.py` → **vedic-astrology**
+`western.py western_ext.py timing.py astrogeo.py hellenistic.py horary.py` → **western-astrology**
+`vedic.py vedic_ext.py shadbala.py` → **vedic-astrology**
 `bazi.py` → **bazi** · `hd.py hd_ext.py` → **human-design** · `ziwei.py` → **ziwei**
 `mayan.py` → **mayan** · `numerology.py` → **numerology** · `divination.py` → **divination**
-`destiny.py` (simple grid) → see **destiny-matrix** (Ladini is authoritative, not `destiny.py`)
+`destiny.py` (real Ladini matrix as of 2026-09-06) → **destiny-matrix**
 
 ## Mandatory Output Rule (all natal systems)
 

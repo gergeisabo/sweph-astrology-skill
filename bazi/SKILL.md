@@ -42,6 +42,14 @@ birth = BirthData("1991-02-15", "18:45:00", 48.2264, 22.0847,
   Ji Chou 3.7–13.7 / Wu Zi 13.7–23.7 / Ding Hai 23.7–33.7 /
   **Bing Xu 33.7–43.7** (age ~35) / Yi You 43.7–53.7 / Jia Shen 53.7–63.7 /
   Gui Wei 63.7–73.7 / Ren Wu 73.7–83.7.
+- `bazi.kua_number(birth_year, gender) -> dict` — Feng Shui Eight-Mansions
+  Ming Gua. gender `"male"`/`"female"`; returns `{birth_year, gender, kua,
+  trigram, direction, group}`. Formula: X = digit-sum(last two digits);
+  pre-2000 male `10-X` / female `X+5`; post-2000 male `9-X` / female `X+6`.
+  Reduce to single digit; **5 → 2 (male) / 8 (female); 0 → 9**. Group East
+  {1,3,4,9} vs West {2,6,7,8}.
+  Gold: 1991 male = **9 Li East** · 1991 female = **6 Qian West** ·
+  1965 male = 8 Gen · 1965 female = 7 Dui · 2005 male = 4 Xun · 1950 male = 2 (5→2).
 
 ## ten_gods() — FIXED 2026-09-06 (commit 01d7bac)
 

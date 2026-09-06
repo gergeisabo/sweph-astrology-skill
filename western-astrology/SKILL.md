@@ -49,6 +49,7 @@ houses = compute_houses(birth)          # Placidus; .house_of(lon) is the ONLY h
 | `moon_void_of_course(birth)` | 48h lookahead | `{is_void_of_course, moon_sign, moon_longitude, last_aspect_jd}` |
 | `element_balance(pos)` | takes pos dict | `{elements, modes, total_planets, dominant_element, dominant_mode}` |
 | `declination_parallels(birth, orb=1.0)` | parallels | list of `{type: 'parallel'|'contra-parallel', planet1, planet2, decl1, decl2, orb}` |
+| `sabian(degree)` | 0-360 longitude (truncates) | `{degree, sign, degree_in_sign, element, modality, symbol}` — neutral gloss (Rudhyar/Jones text is copyright-encumbered; JSON at `astrologica/data/sabian_symbols.json`, 360 entries) |
 
 ## Timing (timing.py)
 
@@ -60,6 +61,32 @@ houses = compute_houses(birth)          # Placidus; .house_of(lon) is the ONLY h
 | `retrograde_periods("Mercury", "2026-01-01", "2026-12-31")` | planet + range | list `{type: retrograde_start|retrograde_end|direct, date_utc, planet, longitude, sign}` |
 | `ingresses("Jupiter", "2026-01-01", "2026-12-31")` | planet + range | list `{date_utc, planet, from_sign, to_sign}` |
 | `transit_calendar(birth, 2026, 3, major_orb=3.0)` | year+month | per-day list `{date, aspects: [{transit, natal, aspect, orb, applying}]}` |
+| `solar_arc(birth, target_age)` | Naibod key (~0.9856°/yr) | `{type, key, target_age, arc_degrees, arc_per_year, directed_positions}` — natal+age×arc. Distinct from `symbolic_directions` (exact 1°/yr) |
+
+## Horary & Electional (horary.py)
+
+```python
+from astrologica import horary
+from datetime import datetime, timezone
+moment = datetime(2026, 3, 15, 14, 30, tzinfo=timezone.utc)
+place = (47.4979, 19.0402)          # (lat, lon)
+
+horary.horary_chart(question, moment, place)
+#   moment: tz-aware datetime OR BirthData. Returns:
+#   {question, moment_utc, ascendant, ascendant_longitude,
+#    querent: {lord, sign, dignity}, quesited: {lord, sign, dignity},
+#    moon: {sign, degree_in_sign, void_of_course, aspects},
+#    significator_aspects, verdict}
+#   L1 = ruler of Asc, L7 = ruler of 7th (quesited); Moon = co-significator.
+#   verdict heuristic: applying L1-L7 aspect -> yes; separating -> no; VOC -> no.
+
+horary.electional_scan(activity, from_date, to_date, place, hour=12)
+#   activity in: marriage, business, money, surgery, travel, house, study, general
+#   casts noon chart daily; scores Moon sign (favourable list) + not-VOC.
+#   Returns {activity, favourable_moon_signs, from_date, to_date, place,
+#            candidates (sorted by score desc), best_date}.
+#   VOC days always excluded. Reuses western_ext.moon_void_of_course.
+```
 
 ## Astro*cartography (astrogeo.py) & Hellenistic (hellenistic.py)
 
@@ -104,6 +131,10 @@ cd ~/Projects/astrologica
 - acg Sun ASC line at lon -158.14 (Aquarius) · relocation to London: ASC 152.83° (Leo 2.83°)
 - hermetic_lots(night): Fortune 156.05, Spirit 179.85, Eros 356.00, Necessity 153.37, Courage 40.88, Victory 342.66
 - ZR L1: Virgo 0-9 (Venus), 12 periods listed
+- solar_arc(1): arc 0.985647° (Naibod) · solar_arc(88): 86.737° ≈ HD's 88° offset
+- horary 2026-03-15 14:30 UTC Budapest: ASC Virgo 150.33°, L1 Mercury (Virgo Detriment), L7 Jupiter (Pisces Exalted), Moon Aquarius not-VOC
+- electional marriage 2026-06-01..10 Budapest: 2 candidates, best 2026-06-07 (Pisces Moon)
+- sabian(0): Aries 1° · sabian(88): Gemini 29° · sabian(359): Pisces 30°
 
 ## Rules
 

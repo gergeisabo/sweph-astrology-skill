@@ -1,6 +1,6 @@
 ---
 name: destiny-matrix
-description: "Use when computing the Destiny Matrix (Матрица судьбы / Ladini) chakra table, karmic tail, or arcana math. Authoritative formulas; note the engine's destiny.py is a different simpler grid."
+description: "Use when computing the Destiny Matrix (Матрица судьбы / Ladini) chakra table, karmic tail, or arcana math. Authoritative formulas; the engine's astrologica.destiny now computes this exact matrix."
 version: 2.0.0
 author: Hermes Agent
 license: MIT
@@ -101,4 +101,4 @@ def sum_digits(n: int) -> int:
 3. **Year digit sum** is computed BEFORE reduction: 1991 → 1+9+9+1 = 20 (already ≤22, no further reduction).
 4. **Different calculators, different results:** Open-source implementations vary in reduction method. The recursive digit-sum method matches the majority of Russian-language reference calculators.
 5. **The Anahata "green points"** (W and X) are NOT simple midpoints — they're computed from S+E and T+E respectively, placing them on the talent/DRK lines.
-6. **`astrologica.destiny.compute()` is a different, simpler grid.** It is not this Ladini chakra table. Do not mix them. For 15.02.1991 the verified Ladini center is E=11 Justice, karmic tail D=10 Wheel — not engine center Lovers / money Tower. An older vault reading (2026-06-26) that put Devil at center used the wrong formulas; do not reuse it.
+6. **`astrologica.destiny.compute()` now computes this exact Ladini matrix.** It returns the base values A/B/C, karmic tail D, comfort zone E, intermediate points S/T/O/P/W/X/N/J, the 7-chakra table (Sahasrara→Muladhara, Physics/Energy/Emotions), and the result row (= reduce of column sums). For 15.02.1991 it yields center E=11 Justice and karmic tail D=10 Wheel. The OLD engine returned center Lovers / money Tower — that was WRONG and has been replaced. An older vault reading (2026-06-26) that put Devil at center used the wrong formulas; do not reuse it.
