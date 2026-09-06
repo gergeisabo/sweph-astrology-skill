@@ -94,10 +94,11 @@ for name in planet_order:
 | `ziwei.py` | ziwei_chart | Zi Wei Dou Shu: 14 main + 16 minor stars, year-stem sihua (Lu/Quan/Ke/Ji). Lunar month/day/hour. |
 | `destiny.py` | compute_destiny | Destiny Matrix (Ladini) |
 | `mayan.py` | tzolkin, haab, long_count, dreamspell | Mayan calendar |
-| `numerology.py` | pythagorean, chaldean, kabbalistic, vedic | Numerology systems |
+| `numerology.py` | full_profile, life_path_number, birthday_number, attitude_number, personal_year, name_number, soul_urge_number, personality_number, vedic_number | Numerology systems (there is NO `pythagorean()` — use `full_profile(name, date_str)`) |
 | `divination.py` | tarot_daily, tarot_spread, iching, runes, geomancy | Divination |
 | `hellenistic.py` | hermetic_lots, egyptian_bounds, zodiacal_releasing_from_fortune | Hellenistic techniques |
-| `render.py` | western_wheel_svg, vedic_wheel_svg, aspect_grid_svg, transit_calendar_markdown, muhurat_markdown, save_svg | SVG/Markdown output |
+| `render.py` | western_wheel_svg(planets_dict, cusps_list, asc), vedic_wheel_svg(planets_dict, cusps_list), aspect_grid_svg, transit_calendar_markdown, muhurat_markdown, save_svg | SVG/Markdown output |
+| `cli.py` | `astro` console script (main) | Terminal access to everything below |
 
 ## Critical Rules
 
@@ -108,6 +109,28 @@ for name in planet_order:
 5. **Time format**: "HH:MM:SS" (include seconds)
 6. **House system**: default is Placidus; pass `system="whole_sign"` for Vedic
 
+## Command Line (CLI)
+
+Installed as console script `astro` (or `.venv/bin/astro`, or `.venv/bin/python -m astrologica.cli`). Birth data via `--profile`, explicit flags, or the `gold` profile default (Gergely, 1991-02-15 18:45 Kisvárda).
+
+```bash
+cd ~/Projects/astrologica
+.venv/bin/astro natal [--sidereal] [--whole-sign] [--profile NAME | --date D --time T --lat N --lon N --tz TZ]
+.venv/bin/astro hd                       # Human Design incl. Variables
+.venv/bin/astro vedic                    # Lahiri: planets + nakshatras + dasha
+.venv/bin/astro bazi                     # Four Pillars JSON
+.venv/bin/astro ziwei                    # Zi Wei (solar→lunar conversion built in, note printed)
+.venv/bin/astro mayan
+.venv/bin/astro timing --age 35 [--solar-return]
+.venv/bin/astro numerology --name "Full Name" [--year 2026]
+.venv/bin/astro transits [YYYY-MM-DD]
+.venv/bin/astro svg natal|vedic [out.svg]
+.venv/bin/astro profiles list | add NAME --date .. --time .. --lat .. --lon .. --tz .. [--place ..]
+.venv/bin/astro selftest                 # gold-data sanity checks, exit 1 on fail
+```
+
+Profiles live in `~/.config/astro/profiles.json`. `--profile` works in ANY position (`astro hd --profile gold` == `astro --profile gold hd`).
+
 ## Verification Reference
 
 Birth data: 1991-02-15 18:45 CET, Kisvárda (48.2264°N, 22.0847°E)
@@ -115,7 +138,7 @@ Birth data: 1991-02-15 18:45 CET, Kisvárda (48.2264°N, 22.0847°E)
 - Sidereal Moon: Aquarius ~14.71°
 - Tropical ASC: Virgo ~17.95°
 - Ayanamsa Lahiri 1991-02-15: ~23.7331°
-- 146 core tests + 129 extension tests = 275 total (all green)
+- 276 tests total (all green)
 
 ## Pitfalls
 
@@ -124,6 +147,9 @@ Birth data: 1991-02-15 18:45 CET, Kisvárda (48.2264°N, 22.0847°E)
 - swe.rise_trans geopos: [lon, lat, alt] — NOT [lat, lon, alt]
 - swe.fixstar_ut: needs ephe/sefstars.txt file (downloaded from aloistr/swisseph GitHub)
 - BaZi formulas: month1_stem = ((year_stem % 5) * 2 + 2) % 10; zi_stem = ((day_stem % 5) * 2 + 2) % 10
+- `destiny.compute()` is a SIMPLER grid, not the Ladini chakra table — for Destiny Matrix use the `esoteric-computation` skill instead (verified: center E=11 Justice, tail D=10 Wheel for 1991-02-15; the engine gives different values)
+- `ziwei_chart(year_stem, year_branch, lunar_month, lunar_day, hour_branch)` takes LUNAR month/day and indices, not BirthData; the CLI does the solar→lunar conversion (Swiss Ephemeris new-moon walk)
+- Mayan functions (`tzolkin`, `haab`, `long_count`) take a DATE STRING, not BirthData
 
 ## Function Signature Notes
 
@@ -193,6 +219,5 @@ The `compute()` function returns a `HumanDesignChart` with these Variable fields
 
 ```bash
 cd ~/Projects/astrologica
-source .venv/bin/activate  # or: .venv/bin/python
-python -m pytest tests/ -q  # expect 261 passed
+.venv/bin/python -m pytest tests/ -q  # expect 276 passed
 ```
