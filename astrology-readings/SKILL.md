@@ -15,7 +15,7 @@ metadata:
 
 Compute with `astrologica` (`~/Projects/astrologica/.venv/bin/astro` CLI, or the Python API). Ladini chakras with `destiny-matrix`. Then **synthesize the intersection**, not a dump of every system.
 
-`astrologica` SKILL.md was reconciled with the code on 2026-09-06 (CLI, correct APIs, 276 tests). The traps below are still worth reading.
+`astrologica` SKILL.md was reconciled with the code on 2026-09-06 (CLI, correct APIs) and re-verified 2026-09-10 (**517 tests**, not 276). The traps below are still worth reading.
 
 ## When to use
 
@@ -28,7 +28,7 @@ User asks what the stars say about money, purpose, timing, travel, alignment, or
 - Gold notes: `/mnt/hdd/00-obsidian/ASTROLOGY/BIRTH CHART DATA.md`
 - HD gold PDF: `/mnt/hdd/00-obsidian/ASTROLOGY/PureGenerators_HumanDesign_Chart.pdf` — **PureGenerators is the website**, not the type.
 
-`core.py` comments that say 17:45 CET and tropical Sun Aquarius 2° are wrong. Feb 15 Sun is ~26° Aquarius. Sidereal Sun ~2.81° Aquarius is the Lahiri value.
+`core.py` comments that say 17:45 CET and tropical Sun Aquarius 2° are wrong. Feb 15 Sun is ~26° Aquarius. Sidereal Sun ~2.81° Aquarius is the Lahiri value. **Birth time is local 18:45 CET = 17:45 UT** — feeding 17:45 as local shifts every house and the Lagna (Leo 13.23° instead of Leo 24.2°).
 
 ## Compute checklist
 
@@ -48,9 +48,9 @@ wh = compute_houses(birth, system="whole_sign", sidereal=True)  # REQUIRED
 - Numerology: `full_profile(name, date_str)` — there is no `pythagorean()`.
 - Night chart for this natal (`is_day=False`) for lots/ZR.
 - HD: `from astrologica.hd import compute as hd_compute`. Gold PDF = engine: **Projector**, wait for invitation, Self-Projected, 3/5, channels 7–31 and 1–8, Cross of Contagion 1 (30/29|14/8).
-- Destiny Matrix: **destiny-matrix**, not `astrologica.destiny.compute()`. Numbers: skill_view `destiny-matrix` file `references/verified-1991-02-15-chakras.md`.
+- Destiny Matrix: `astro destiny` (CLI, added 2026-09-10) or `astrologica.destiny.compute(date_str)`. The engine's `destiny.py` was rewritten (commit 7976318) and **now computes the verified Ladini matrix itself** — do NOT hand-compute it and do NOT fall back to the old vault numbers. `destiny-matrix` remains the formula authority; verify against its `references/verified-1991-02-15-chakras.md` (A=15 Devil, center E=11 Justice, tail D=10 Wheel).
 - BaZi pillars gold: Xin Wei / Geng Yin / **Bing Chen** / Ding You. Day Master **Bing Fire**. Hour Ding = Jie Cai on You Direct Wealth.
-- `ten_gods()` inverts Direct/Indirect for wealth/resource/output/power. Recompute with standard polarity (Direct = opposite yin/yang except companion: same = Bi Jian, opposite = Jie Cai).
+- `ten_gods()` was FIXED in the engine on 2026-09-06 (commit 01d7bac) and now returns **standard** Direct/Indirect polarity directly. **Do NOT re-apply the polarity rule on top of engine output — that double-corrects it.** Gold anchor: `hour_stem='Jie Cai'`, `hour_branch='Zheng Cai'`. If those ever fail after an engine change, only then re-apply: Direct = opposite yin/yang for wealth/resource/output/power.
 - Luck pillars `luck_pillars(birth, "male")`. Age 35 = Bing Xu (~33.7–43.7), not the old vault Ding-Hai table.
 
 ## Do not reuse

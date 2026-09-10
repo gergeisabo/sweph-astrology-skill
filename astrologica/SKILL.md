@@ -86,7 +86,7 @@ flags, or the default `gold` profile. `--profile` works in any position.
 
 ```bash
 cd ~/Projects/astrologica
-.venv/bin/astro natal|vedic|hd|bazi|ziwei|mayan [flags]     # per-system
+.venv/bin/astro natal|vedic|hd|bazi|ziwei|destiny|mayan [flags]  # per-system
 .venv/bin/astro transits [YYYY-MM-DD]                        # transits for a date
 .venv/bin/astro timing --age 35 [--solar-return]             # profections / returns
 .venv/bin/astro numerology --name "Full Name"
@@ -105,7 +105,8 @@ Profiles live in `~/.config/astro/profiles.json`.
 - Tropical Sun **26.54° Aquarius** · Sidereal Sun **2.81° Aquarius** · Tropical ASC **Virgo 17.95°**
 - Ayanamsa Lahiri 1991-02-15: **~23.7331°**
 - Notes/docs: `/mnt/hdd/00-obsidian/ASTROLOGY/BIRTH CHART DATA.md`
-- `core.py` comments saying "17:45 CET" / "tropical Sun Aquarius 2°" are WRONG — Feb 15 Sun is ~26° Aquarius tropical; 2.81° is the SIDEREAL (Lahiri) value.
+- **Birth-time trap (do not reintroduce):** the only correct input is local **18:45** CET = 17:45 UT. Passing `17:45` as the *local* time silently computes a chart one hour early — sidereal Lagna **Leo 13.23°** instead of the correct **Leo 24.2°**, every house shifted. This bug was live in `tests/test_core_verify.py` until 2026-09-10 (fix commit 435e5ce); the suite passed while verifying the wrong sky because its expected values had been generated for the bad anchor.
+- Feb 15 Sun is ~**26.54° Aquarius tropical**; **2.81° Aquarius is the SIDEREAL (Lahiri)** value — never mix the columns. `core.py`'s docstring had them swapped and was corrected 2026-09-10.
 
 ## Full Engine (module → dedicated skill)
 
@@ -127,5 +128,5 @@ never eyeballed or skipped.
 
 ```bash
 cd ~/Projects/astrologica
-.venv/bin/python -m pytest tests/ -q  # expect 283 passed
+.venv/bin/python -m pytest tests/ -q  # expect 517 passed
 ```
