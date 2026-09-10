@@ -112,18 +112,47 @@ declination = res[1]  # declination
 
 Without `FLG_EQUATORIAL`, `res[1]` is ecliptic latitude, NOT declination.
 
-## 7. Sidereal mode — manual subtraction preferred
+## 7. Sidereal mode — the REAL trap is the hidden global mode, not "corruption"
 
-Two approaches exist:
-- **(A) Manual:** `sidereal = (tropical - swe.get_ayanamsa(jd)) % 360`
-- **(B) Flag:** `swe.set_sid_mode(SIDM_LAHIRI)` + `FLG_SIDEREAL`
+RESOLVED 2026-09-10 by direct measurement (repro + full evidence:
+`references/sidereal-mode-resolved.md`). Two archived copies of this note contradicted
+each other; the measurement settles it.
 
-Approach A is preferred because:
-- It's stateless (no library-side state to leak between calls)
-- It's deterministic (same inputs always produce same outputs)
-- `set_sid_mode()` persists in library state and can conflict with other code
+**FALSE (do not repeat):** "`set_sid_mode()` persists in C state and silently applies the
+ayanamsa correction to `calc_ut()` even when `FLG_SIDEREAL` is not in the flags."
+Measured: tropical Sun is `326.541235` before any sidereal call, after `get_ayanamsa()`,
+and after `set_sid_mode(SIDM_LAHIRI)` — **identical to 9 decimal places**. Without
+`FLG_SIDEREAL` nothing is corrected. If your tropical values are ~24° off, the bug is in
+your own subtraction, not the library.
 
-**Never read tropical values as sidereal.** This caused a multi-day bug in sweph-astrology where Astro Seek comparisons were wrong because the code assumed tropical when Astro Seek showed sidereal.
+**TRUE — the actual silent failure:** the sidereal mode is process-global state and the
+library default is **not Lahiri**.
+
+- `swe.get_ayanamsa(jd)` returns the ayanamsa of *whatever mode is currently set*. Called
+  before any `set_sid_mode()`, it returned **24.616322°** for 1991-02-15 — wrong by
+  0.883° (~53 arc-min) versus Lahiri's 23.733115°. No error, no warning.
+- `FLG_SIDEREAL` also silently uses the current mode: switching to `SIDM_RAMAN` shifted
+  the result by **86.78 arc-min** with no exception.
+
+**Safe pattern (use this):**
+
+```python
+flags = swe.FLG_SWIEPH | swe.FLG_SPEED     # NEVER add FLG_SIDEREAL
+tropical = swe.calc_ut(jd, pid, flags)[0][0]
+swe.set_sid_mode(swe.SIDM_LAHIRI)          # ALWAYS set the mode explicitly first
+ay = swe.get_ayanamsa(jd)                  # then read it
+sidereal = (tropical - ay) % 360.0         # then subtract manually
+```
+
+**Also do not reorder the last two steps.** `get_ayanamsa()` before `set_sid_mode()` is
+the whole bug. And note the two approaches are not bit-identical: at 1991-02-15 the
+direct `FLG_SIDEREAL` path differed from `tropical - get_ayanamsa()` by ~16 arc-sec, so
+do not chase a 16" discrepancy against a published reference — it is expected, not a bug.
+
+**Never read tropical values as sidereal.** This caused a multi-day bug in sweph-astrology
+where Astro Seek comparisons were wrong because the code assumed tropical when Astro Seek
+showed sidereal. When a source has "Sidereal: Ayanamsa 23°44' (Lahiri)" enabled, ALL its
+displayed positions are already sidereal.
 
 ## 8. House system byte codes
 
@@ -151,7 +180,7 @@ res, _ = swe.calc_ut(jd, swe.VENUS, swe.FLG_SWIEPH | swe.FLG_SPEED | swe.FLG_HEL
 
 ## 10. Solar→lunar conversion (no built-in in pyswisseph)
 
-pyswisseph has no lunar-calendar converter. Working approach (used in sweph-astrology's `astro` CLI): lunar day = days since last new moon + 1; lunar month = new moons since the new moon in the Jan 20–Feb 20 window (Chinese New Year rule). Find new moons by walking the Sun–Moon elongation `(moon-sun) % 360` back in 0.25-day steps until it wraps >360→small, then bisect on `elong(mid) > 180`. Sanity check: 1991-02-15 must give lunar M1 D1 (CNY was Feb 15, 1991, Xin Wei year).
+pyswisseph has no lunar-calendar converter. Working approach (used in sweph-astrology's `astro` CLI and `astrologica/lunar.py`): lunar day = days since last new moon + 1; lunar month = new moons since the month containing the winter solstice (month 11); leap month = first month after month 11 containing no principal solar term (中气， Sun crossing every other 30° multiple from 270°). Find new moons by walking the Sun–Moon elongation `(moon-sun) % 360` back in 0.25-day steps until it wraps >360→small, then bisect on `elong(mid) > 180`. **Round new-moon AND solar-term instants to whole China civil days (Asia/Shanghai, UTC+8) before classifying** — classifying by raw instants picks the wrong leap month in edge years (two events falling on the same UTC day can split across a China-day boundary). Sanity checks: 1991-02-15 → lunar M1 D1 (CNY was Feb 15, 1991); 2023-04-01 → month 2, leap=True; 2025 has leap month 6, not 7.
 
 ## 11. Entry-point scripts with uv venvs
 
@@ -180,3 +209,84 @@ yourself, re-smoke-test each new function's claimed gold value, and `git push` (
 commit but do not always push — `git status -sb` shows the ahead count). Give each child
 one independent invariant/oracle check (e.g. SAV total = 337; Sun-in-Leo sthana bala >
 Sun-in-Aquarius; solar arc ≈ 1°/year) so wrong OUTPUT is caught, not just wrong code.
+
+## 14. Treat every "known limitation" caveat as possibly-stale documentation
+
+A caveat in a skill or docstring may describe a bug that was already fixed while the
+caveat was never deleted — repeating it poisons later readings and prompts agents to
+"work around" correct code. Before propagating any caveat, re-verify it against ground
+truth (reference PDF, independent calculator, published table). If the values already
+match, DELETE the caveat and add the regression test + naming layer instead. Never
+accept "it was never broken" from a subagent either — pull the ground-truth artifact
+yourself; a caveat removed without verification is whitewashing, a caveat kept after
+verification passes is rot.
+
+## 15. Never invent traditional-system tables
+
+When implementing tables from a divination/astrology tradition (sihua, dasha orders,
+compatibility matrices), web-research the authoritative source FIRST and implement only
+what actually exists in the tradition. Task premises about "which tables exist" can be
+wrong (e.g. Zi Wei sihua is stem-keyed only — there is no year-branch 四化 table in any
+published source); inventing one produces authoritative-looking wrong output that tests
+can't catch because the test fixtures came from the same invention. If the requested
+table doesn't exist, say so and implement the real system instead.
+
+## 16. Probe boundary inputs before calling an engine robust
+
+An all-green suite from happy-path fixtures says nothing about edge inputs. Before
+declaring a computation engine finished, run an adversarial sweep: polar latitudes
+(Placidus is undefined above ±66.6° — need a fallback house system), garbage date
+strings (raw `int()` ValueError instead of a clear message), out-of-range indices
+(nakshatra outside 0–26 → raw KeyError), boundary longitudes (exact gate/cusp edges),
+southern hemisphere, leap days, ephemeris range extremes (1900/2100), and string-vs-
+datetime argument confusion. Each fix gets a regression test so the sweep is one command
+next time.
+
+## 17. Anchor day/night searches to LOCAL midnight, not UT midnight
+
+When searching `swe.rise_trans` (or any daily event) for "today" at a birth location,
+anchor the search at local midnight (00:00 in the birth timezone → JD), not JD-of-
+UT-midnight. At far-east longitudes the UT-midnight anchor falls on the previous local
+evening, so the rise/set bracket skips a local day and classifies a noon birth as
+night with an absurd (30h+) span. Same rule for anything keyed to "the birth day"
+solar-wise: convert to the birth tz first.
+
+## 18. A bisection that never tightens both bounds converges to the scan grid
+
+When root-finding a crossing (ingress, station, lunation) inside a coarse step scan,
+the bisection must move BOTH bracket ends inward; a predicate like
+`abs(lon-hi) < abs(lon-lo)` that only ever replaces one end converges to the original
+step midpoint, silently quantizing every event time to the scan grid (12h steps →
+events reported at 00:00/12:00 exactly). Regression-check against a published instant
+(e.g. a solstice/equinox to the minute) — internal consistency won't catch it.
+
+## 19. The lunar node has TWO modes — check which one a reference used
+
+`swe.TRUE_NODE` and `swe.MEAN_NODE` are different bodies, not synonyms, and they can
+differ by **up to ~1.4°** (at 1991-02-15 18:45 CET: true = 298.869°, mean = 296.713°,
+a gap of 69.4 arc-min). A published node that "doesn't match" is usually the other mode,
+not a bug — but an unexplained 1°+ node discrepancy will otherwise sit in a project for
+months (this one did).
+
+**Which to use:** classical Jyotish uses the **MEAN** node for Rahu/Ketu (always); modern
+Western software usually defaults to TRUE. Make it an explicit parameter rather than a
+buried constant, and print/record which mode produced a result — see
+`astrologica.core.NODE_MODES` / `compute_positions(..., node="mean"|"true")`, which
+defaults to `mean`.
+
+**Ketu is not a separate body** — it is `Rahu + 180°` with the latitude negated, and it
+inherits whatever node mode Rahu used. If you switch modes for Rahu, recompute Ketu.
+
+**Corollary — derive aspects from the positions you display.** If your CLI prints
+positions using a configurable mode but computes aspects from a second, independent
+`compute_positions()` call with default options, the aspect table silently disagrees with
+the position table under any non-default flag. Pass the computed positions into the
+aspect function instead of recomputing.
+
+## 20. Validate lookup indices with ValueError, never modulo-wrap
+
+Traditional-system table lookups (`idx % 10`, `idx % 12`, `idx % 27`) turn an invalid
+index into plausible-looking garbage — `sihua_for_stem(10)` returned stem-0's row
+without a whisper. Range-check every index argument at function entry
+(`if not 0 <= idx <= 9: raise ValueError(...)`) so bad input is loud, even when a
+wrapping caller "would have worked".

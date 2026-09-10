@@ -65,6 +65,12 @@ Uranus, Neptune, Pluto, Rahu, Ketu, Chiron, Lilith
 ```
 
 - `Rahu` = North Node (NOT "North Node"); `Ketu` = South Node (computed as opposite of Rahu)
+- **Node mode matters (~1.4°):** Rahu/Ketu default to the **MEAN** node — classical
+  Jyotish convention, and what the reference chart quotes (Capricorn 26°42' = 296.713°).
+  The TRUE node is 298.869° for the gold birth — a 1.1565° (69.4') gap. Override per call
+  (`compute_positions(birth, node="true")`), per CLI (`--node true`), or env
+  `ASTROLOGICA_NODE=true`. Always state which mode a published node used before calling
+  it "wrong".
 - `Lilith` = Mean Black Moon Lilith (swe body 12); `Chiron` = centaur Chiron (swe body 15)
 - **NEVER hardcode a planet list** — iterate `pos.items()`, or Rahu/Ketu/Chiron/Lilith get silently skipped.
 - **House = `houses.house_of(p.longitude)` ALWAYS** — never eyeball from cusps (Placidus cusps are non-uniform → off-by-one errors).
@@ -87,6 +93,13 @@ flags, or the default `gold` profile. `--profile` works in any position.
 ```bash
 cd ~/Projects/astrologica
 .venv/bin/astro natal|vedic|hd|bazi|ziwei|destiny|mayan [flags]  # per-system
+.venv/bin/astro gochara [YYYY-MM-DD]                         # Vedic transits + Sade Sati + SAV
+.venv/bin/astro shadbala                                     # six-fold strength
+.venv/bin/astro hd-transits [YYYY-MM-DD]
+.venv/bin/astro astrogeo [--relocate LAT LON]                # ACG lines + parans
+.venv/bin/astro horary --question "..." [--when "YYYY-MM-DD HH:MM:SS"]
+.venv/bin/astro electional --activity marriage --from 2026-10-01 --to 2026-11-30
+.venv/bin/astro natal --node true                            # Rahu/Ketu: mean (default) | true
 .venv/bin/astro transits [YYYY-MM-DD]                        # transits for a date
 .venv/bin/astro timing --age 35 [--solar-return]             # profections / returns
 .venv/bin/astro numerology --name "Full Name"
@@ -128,5 +141,5 @@ never eyeballed or skipped.
 
 ```bash
 cd ~/Projects/astrologica
-.venv/bin/python -m pytest tests/ -q  # expect 517 passed
+.venv/bin/python -m pytest tests/ -q  # expect 533 passed
 ```

@@ -15,7 +15,7 @@ metadata:
 
 Compute with `astrologica` (`~/Projects/astrologica/.venv/bin/astro` CLI, or the Python API). Ladini chakras with `destiny-matrix`. Then **synthesize the intersection**, not a dump of every system.
 
-`astrologica` SKILL.md was reconciled with the code on 2026-09-06 (CLI, correct APIs) and re-verified 2026-09-10 (**517 tests**, not 276). The traps below are still worth reading.
+`astrologica` SKILL.md was reconciled with the code on 2026-09-06 (CLI, correct APIs) and re-verified 2026-09-10 (**533 tests**, not 276). The traps below are still worth reading.
 
 ## When to use
 
@@ -41,7 +41,7 @@ sid = compute_positions(birth, sidereal=True)
 wh = compute_houses(birth, system="whole_sign", sidereal=True)  # REQUIRED
 ```
 
-- Houses: always `houses.house_of(lon)`. Iterate `pos.items()` (keys are Rahu/Ketu, not North Node).
+- Houses: always `houses.house_of(lon)`. Iterate `pos.items()` (keys are Rahu/Ketu, not North Node). **Node mode:** Rahu/Ketu default to the MEAN node (matches the reference chart); pass `node="true"` only when a source quotes a true node — the two differ by 1.16° for this birth.
 - Vedic dasha: `vimshottari_dasha(birth, sid["Moon"].longitude)`.
 - Yogas: `yogas(sid, wh, int(wh.ascendant // 30))` — `lagna_sign` required.
 - Progressions: date string, not year int.

@@ -122,7 +122,7 @@ lal_kitab_dasha(birth)   # 7 dicts {lord, start_date, end_date, duration_years=5
 
 ## Vedic Transits — Gochara (`gochara.py`)
 
-Python-API only (no CLI subcommand yet). All positions sidereal (Lahiri).
+CLI: `astro gochara [YYYY-MM-DD]` (added 2026-09-10). All positions sidereal (Lahiri).
 
 ```python
 from astrologica.gochara import gochara, sade_sati, vedic_transit_report
