@@ -15,7 +15,7 @@ metadata:
 
 Compute with `astrologica` (`~/Projects/astrologica/.venv/bin/astro` CLI, or the Python API). Ladini chakras with `destiny-matrix`. Then **synthesize the intersection**, not a dump of every system.
 
-`astrologica` SKILL.md was reconciled with the code on 2026-09-06 (CLI, correct APIs) and re-verified 2026-09-10 (**533 tests**, not 276). The traps below are still worth reading.
+`astrologica` SKILL.md was reconciled with the code on 2026-09-06 (CLI, correct APIs) and re-verified 2026-09-10 (**535 tests**, not 276). The traps below are still worth reading.
 
 ## When to use
 

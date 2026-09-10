@@ -141,5 +141,5 @@ never eyeballed or skipped.
 
 ```bash
 cd ~/Projects/astrologica
-.venv/bin/python -m pytest tests/ -q  # expect 533 passed
+.venv/bin/python -m pytest tests/ -q  # expect 535 passed
 ```
