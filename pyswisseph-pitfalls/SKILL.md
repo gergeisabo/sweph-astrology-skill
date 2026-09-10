@@ -211,6 +211,34 @@ commit but do not always push — `git status -sb` shows the ahead count). Give 
 one independent invariant/oracle check (e.g. SAV total = 337; Sun-in-Leo sthana bala >
 Sun-in-Aquarius; solar arc ≈ 1°/year) so wrong OUTPUT is caught, not just wrong code.
 
+**The same distrust applies to a child's ANALYSIS, not just its test counts.** A fan-out that
+reports "40% of this tree is duplicated", "these two files are verbatim copies", or "each module
+defers to the other" is making measurable claims — measure them before acting. In one audit the
+children reported 40% duplication (true figure 3.4%), called two independently-worded documents
+"verbatim" (zero shared sentences), and described a one-way pointer as a circular dependency (the
+reverse reference did not exist). Only their *quoted file:line evidence* survived checking; every
+derived number was inflated. Default assumption: a child's counts are estimates dressed as
+measurements.
+
+**Shape the fan-out as a MIXTURE, not N copies.** Several generalist children reading the same
+material converge on the same answer and then confirm each other's errors — agent consensus is not
+corroboration. Give each child a different lens *and* a different method: an adversarial verifier
+told to ATTACK the previous round's claims, a quantitative pass that measures what the others only
+assert, a wider-scope scout that searches outside the agreed boundary, a simulation pass that tests
+the result against real usage, and a history archaeologist that mines what a snapshot comparison
+cannot see. Expect the adversarial lens to refute you — if a "verification" round found nothing
+wrong, it was not adversarial enough to be worth its cost.
+
+**Measuring a text corpus: count lines, and exclude frontmatter.** "How much of this is
+duplicated" is answerable exactly, and estimating it is how you get it wrong by 10x. Measure
+at LINE level — whole-file and whole-paragraph similarity both undercount badly, because the
+same line repeated inside two differently-worded paragraphs never forms a matching block (one
+pass reported 0.1% duplication for a tree where grep had already proven seven identical
+constructors). Then strip YAML frontmatter and report it separately: metadata lines
+(`category:`, `version:`, `author:`) dominate raw duplicate counts and are noise. Classify
+matches as code-fence vs prose and report the two separately — code that drifts breaks things,
+prose that drifts merely reads oddly.
+
 ## 14. Treat every "known limitation" caveat as possibly-stale documentation
 
 A caveat in a skill or docstring may describe a bug that was already fixed while the
@@ -292,7 +320,42 @@ positions using a configurable mode but computes aspects from a second, independ
 the position table under any non-default flag. Pass the computed positions into the
 aspect function instead of recomputing.
 
-## 20. Validate lookup indices with ValueError, never modulo-wrap
+## 20. Know your oracle's display resolution before chasing a small delta
+
+The residual between your engine and a reference site is not all error — some of it
+is the site's **display convention**. astro-seek prints degrees and arc-minutes
+**truncated (floored), not rounded**, so every value it publishes reads up to 1 arc-minute
+LOW. Chasing that 1' as if it were a bug wastes hours; ignoring it as "close enough"
+hides a real error underneath.
+
+The tell is the **sign of the residual**. Against a floored oracle, your values should sit
+consistently just ABOVE the published ones, by less than one display unit. A residual that
+flips sign, or exceeds one display unit, is a genuine disagreement.
+
+Method, in order:
+
+1. Establish the oracle's unit of display (whole arc-minute? arc-second? decimal degrees?).
+2. Set tolerance from that unit plus the input differences you know about (coordinate
+   rounding, time precision) — and write the reason in the test, as a comment.
+3. Assert the **structural** property, not just a width: e.g. `0 <= ours - theirs < 1'`.
+   A wide symmetric band (`abs(delta) < 2'`) passes on a floored oracle whether or not
+   your mode is right.
+4. Only then treat a violation as a real defect.
+
+Also compare **whole extra systems**, not one chart. An oracle that exposes an ayanamsa
+selector validates five code paths at once; re-asserting one chart validates one. The
+five-system astro-seek check caught that Lahiri-vs-Raman is an 86' gap — big enough that
+a mode mixup can never hide inside a rounding tolerance.
+
+### The corollary that matters most
+
+A cross-check is only worth something if the two sides are **actually independent**. A
+reference that shares your library, your ephemeris, or your ayanamsa setting will agree
+with you while both are wrong. Before trusting agreement, ask what the two sides share —
+in the case that motivated this rule, two "independent" sources agreed on a lunar node
+because both silently used the true node, and the check certified a 69' error.
+
+## 21. Validate lookup indices with ValueError, never modulo-wrap
 
 Traditional-system table lookups (`idx % 10`, `idx % 12`, `idx % 27`) turn an invalid
 index into plausible-looking garbage — `sihua_for_stem(10)` returned stem-0's row
@@ -300,7 +363,7 @@ without a whisper. Range-check every index argument at function entry
 (`if not 0 <= idx <= 9: raise ValueError(...)`) so bad input is loud, even when a
 wrapping caller "would have worked".
 
-## 21. A green suite calibrated on a wrong anchor verifies nothing
+## 22. A green suite calibrated on a wrong anchor verifies nothing
 
 An all-green suite with a *tight* tolerance can be certifying the wrong chart. If the
 fixture's INPUT is wrong (wrong birth time, wrong coordinates, wrong tz handling), every
@@ -323,7 +386,7 @@ say so in a comment, and prefer relational assertions over absolute ones —
 `sidereal == tropical - ayanamsa`, `Ketu == Rahu + 180`, `len(pos) == N`. A relation fails
 loudly when the anchor drifts; an absolute value silently re-ratifies it.
 
-## 22. A CLI positional sharing a parent parser's option name is silently dead
+## 23. A CLI positional sharing a parent parser's option name is silently dead
 
 `add_parser("transits", parents=[common])` plus `add_argument("date")` puts the positional
 into the SAME `args.date` dest as the parent's `--date` flag. The option handler then reads
@@ -334,3 +397,39 @@ correct in `--help`. Neither the parser nor `--help` warns you.
 Give every positional a dest no option uses (`when`, not `date`), and add a regression
 test that invokes each subcommand WITH its positional argument. A subcommand that only
 ever gets tested bare will keep this bug indefinitely.
+
+## 24. A stated value and a stated delta can silently disagree
+
+Reference data written into a skill, docstring or report often pairs an absolute value with a
+difference from another value. Nothing recomputes that pair, so a single mistyped digit survives
+review indefinitely and *reads* as verified. Real case: the true node was written as `298.869°`
+beside `mean 296.713°` and a claimed `1.1565°` gap — but 298.869 − 296.713 = 2.156. The gap was
+right and the value was a typo for `297.869°`.
+
+Rule: whenever you save two arithmetically related numbers, compute the relation first, and
+re-derive the pair from the engine rather than from your memory of what it printed. An internally
+inconsistent pair is worse than a missing number — a reader (or an adversarial pass) will find the
+contradiction long before anyone finds the correct value. The same check catches unit slips
+(deg vs arc-min, arc-sec vs arc-min) that no test exercises.
+
+## 25. Verify the SETTINGS, not just the maths
+
+The calculation is accurate to under an arc-second; a wrong mode is measured in degrees.
+Verification effort therefore belongs on configuration, not on the ephemeris. Three rules,
+with the measurements behind them, are in `references/verifying-output.md` — read it before
+calling any chart "verified":
+
+- **Two sources that share a setting are one source.** A "cross-check" where both paths used
+  the same node/ayanamsa/house mode agrees perfectly and proves nothing — and the agreement
+  manufactures confidence. List the axes a check could vary and confirm the two paths differ
+  on the one under test.
+- **Every published number carries its mode** (node, ayanamsa, house system, ephemeris files,
+  time source) on the same line as the value, or it is not a result.
+- **A component flagged as broken still poisons the total you publish.** Recompute with and
+  without it, or drop the ranking; never ship a derived ordering built on a sum you have
+  annotated as corrupt.
+
+Error budget, measured: ephemeris < 1 arc-sec · coordinates rounded to the arc-minute
+0.1 arc-min · **birth time off by 1 minute = 11 arc-min of Ascendant** · true vs mean node
+69 arc-min · ayanamsa choice up to 87 arc-min · birth time off by 1 hour ≈ 11°. Do not
+"improve" the astronomy; it is not the limiting factor.
