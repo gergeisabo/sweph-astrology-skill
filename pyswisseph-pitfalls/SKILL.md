@@ -323,10 +323,16 @@ aspect function instead of recomputing.
 ## 20. Know your oracle's display resolution before chasing a small delta
 
 The residual between your engine and a reference site is not all error — some of it
-is the site's **display convention**. astro-seek prints degrees and arc-minutes
-**truncated (floored), not rounded**, so every value it publishes reads up to 1 arc-minute
-LOW. Chasing that 1' as if it were a bug wastes hours; ignoring it as "close enough"
-hides a real error underneath.
+is the site's **display convention**. Do not assume the site has ONE convention:
+measured 2026-09-10, astro-seek displays the *same* Lahiri ayanamsa as
+`23°43'` on its ayanamsa comparison table (**truncated**) and `23°44'` on its chart
+header (**rounded**). The underlying value is 23.733115° = 23°43.9869', i.e.
+0.8 arc-seconds below the arcminute boundary — the sharpest possible test case, and
+**both readings are correct**.
+
+So establish the convention **per page**, not per site. Chasing a 1 arc-minute
+delta as if it were a bug wastes hours; ignoring it blindly hides a real error
+underneath.
 
 The tell is the **sign of the residual**. Against a floored oracle, your values should sit
 consistently just ABOVE the published ones, by less than one display unit. A residual that
@@ -334,7 +340,9 @@ flips sign, or exceeds one display unit, is a genuine disagreement.
 
 Method, in order:
 
-1. Establish the oracle's unit of display (whole arc-minute? arc-second? decimal degrees?).
+1. Establish that **page's** unit of display and its rounding direction (whole
+   arc-minute? truncated or rounded? arc-second? decimal degrees?). Match the
+   comparison like-for-like before computing any delta.
 2. Set tolerance from that unit plus the input differences you know about (coordinate
    rounding, time precision) — and write the reason in the test, as a comment.
 3. Assert the **structural** property, not just a width: e.g. `0 <= ours - theirs < 1'`.
@@ -385,6 +393,14 @@ local time and the UT it equals), widen the tolerance only where rounding justif
 say so in a comment, and prefer relational assertions over absolute ones —
 `sidereal == tropical - ayanamsa`, `Ketu == Rahu + 180`, `len(pos) == N`. A relation fails
 loudly when the anchor drifts; an absolute value silently re-ratifies it.
+
+**After fixing the anchor, sweep the whole tree for that LITERAL before calling it done.**
+The file where a wrong fixture value surfaces is rarely the only one carrying it. Grep for
+the literal itself (the time string, the coordinate pair, the constant) rather than for the
+symbol — a symbol grep finds the API surface, not the bad value repeated across fixtures.
+A tree with one corrected module and several stale ones is WORSE than a uniformly wrong
+one: the corrected module makes the suite look maintained while its siblings keep certifying
+the old baseline, so the next reader trusts a partially-repaired reference set.
 
 ## 23. A CLI positional sharing a parent parser's option name is silently dead
 
