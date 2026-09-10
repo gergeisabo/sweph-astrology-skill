@@ -444,6 +444,57 @@ calling any chart "verified":
 - **A component flagged as broken still poisons the total you publish.** Recompute with and
   without it, or drop the ranking; never ship a derived ordering built on a sum you have
   annotated as corrupt.
+- **A settings panel may not declare everything — recover undeclared settings from the value.**
+  A source can state its ayanamsa and its house system and still be silent on the node mode, so
+  a faithfully transcribed "settings block" is still not sufficient provenance. When a setting is
+  unstated, compute it BOTH ways and infer which one the source used from an output it prints
+  (a D1 node reading of `Cap 02°` selects the mean node, because the true node reads `Cap 04°`),
+  then record the inference and its evidence next to the declared settings. Keep the captured
+  settings in one canonical block with the birth data, and make the rule explicit: if a number
+  cannot be traced to that block, it is not a verified result.
+
+## 26. Before calling a divergence a "school difference", get a THIRD implementation
+
+This section previously argued the opposite, from a real measurement: our engine matched astro-seek
+on D1, D2, D3, D7, D9, D10, D12, D24, D60 and diverged on D4, D16, D20, D27, D30, D40, D45. The
+divergence looked like the literature's multiple starting-sign rules, so it was recorded as a
+legitimate convention difference. **It was a bug in our rules.**
+
+What settled it was adding a second independent oracle — Prokerala's live
+`/astrology/divisional-planet-position` API. astro-seek and Prokerala agree with each other on
+**80/80 body-checks** across exactly the contested charts, and both disagreed with us.
+
+**The rule:** one reference disagreeing with you is not evidence of a convention. Two references
+agreeing with each other is evidence against you. Before you declare a school difference, obtain
+the implementation count that makes it decidable:
+
+- If reference A and reference B **disagree with each other**, the convention is genuinely
+  school-dependent — then declare which school you implement and test against the one you claim.
+- If reference A and reference B **agree with each other and disagree with you**, it is your bug.
+  No amount of "tradition has variants" language makes it correct, and publishing it under a
+  conventions caveat is worse than publishing nothing: it launders an error as a choice.
+
+Independent oracles worth having: astro-seek (Vedic divisional + ayanamsa tables), Prokerala
+(`divisional-planet-position`, `planet-position`, `dasha-periods` — cheap, returns numerical
+sign + degree, Lahiri via `ayanamsa=1`). Two is the minimum that can decide anything; one is a
+coin flip you have dressed up as a comparison.
+
+### Still true: a derived number needs a declared constant
+
+The engine returns raw Shadbala in Rupas. The "strength ratio" divides by a **minimum Rupas**
+constant that differs between authorities — Sun = **5** in B.V. Raman's *Graha and Bhava Balas*,
+**6.5** in BPHS as published by modern calculators. On a byte-identical total that moves the Sun
+from rank #1 (9.215/5 = 1.843) to rank #3 (9.215/6.5 = 1.418). Never publish a ranking or a ratio
+without naming the constant: an undeclared constant is not a result, it is ambiguity with a number
+attached.
+
+Corollary from the same episode: deriving a rule by **fitting against an oracle** is only sound when
+the fit is checked against a *different* oracle than the one you fitted to. The D4 rule was derived
+from astro-seek's numbers alone and then reproduced Prokerala's independently-fetched values — that
+is confirmation. A rule that fits one source and is never tested on another is a curve-fit.
+
+Decision table, per-division match counts, the mechanism and the probing recipe:
+`references/oracle-divergence-classes.md`.
 
 Error budget, measured: ephemeris < 1 arc-sec · coordinates rounded to the arc-minute
 0.1 arc-min · **birth time off by 1 minute = 11 arc-min of Ascendant** · true vs mean node
