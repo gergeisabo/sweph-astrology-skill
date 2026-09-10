@@ -1,6 +1,6 @@
 ---
 name: ziwei
-description: "Use when computing Zi Wei Dou Shu (Purple Star) charts, palaces, bureau, or sihua. Live-verified against the gold birth."
+description: "Use when computing Zi Wei Dou Shu (Purple Star) charts. Palaces, bureau, sihua, lunar calendar conversion. Hungarian: kínai csillagászat, bíbor csillag."
 version: 1.0.0
 metadata:
   hermes:

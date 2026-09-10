@@ -15,7 +15,7 @@ Per-system Hermes Agent skills for the local [sweph-astrology](https://github.co
 | `mayan` | Tzolkin, Haab, Long Count, Dreamspell | `astro mayan` |
 | `numerology` | Life path, soul urge, expression, chaldean/kabbalistic | `astro numerology` |
 | `divination` | Tarot, I Ching, runes, geomancy (seeded) | — |
-| `esoteric-computation` | Destiny Matrix (Ladini) chakras — authoritative | — |
+| `destiny-matrix` | Destiny Matrix (Ladini) chakras — authoritative | — |
 | `pyswisseph-pitfalls` | Engine-building pitfalls | — |
 | `astrology-readings` | Multi-system synthesis method | — |
 

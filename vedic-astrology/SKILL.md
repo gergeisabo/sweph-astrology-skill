@@ -1,6 +1,6 @@
 ---
 name: vedic-astrology
-description: "Use when computing Vedic/Jyotish astrology — sidereal charts, nakshatras, Vimshottari/Ashtottari dasha, vargas, yogas, doshas, panchang, ashtakoota matching, muhurat, ashtakavarga. Runs live local astrologica engine."
+description: "Use when computing Vedic/Jyotish charts, dasha, nakshatra, muhurat. Sidereal charts, Vimshottari/Ashtottari dasha, vargas, yogas, doshas, panchang, ashtakoota, ashtakavarga. Hungarian: védikus horoszkóp, jós."
 version: 1.0.0
 author: Hermes Agent
 metadata:

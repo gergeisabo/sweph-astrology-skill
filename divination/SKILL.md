@@ -1,6 +1,6 @@
 ---
 name: divination
-description: "Use when drawing tarot, I Ching, runes, or geomancy. No birth data needed — oracle draws for questions, daily pulls, spreads."
+description: "Use when drawing tarot, I Ching, runes, or geomancy. Oracle draws for questions, daily pulls, spreads; no birth data needed. Hungarian: tarot, jós, kártya, rúna."
 version: 1.0.0
 author: Hermes Agent
 metadata:

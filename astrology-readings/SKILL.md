@@ -1,6 +1,6 @@
 ---
 name: astrology-readings
-description: "Use when synthesizing a multi-system natal reading."
+description: "Use when reading a chart or asking what the stars say. Covers 'read my chart', money, purpose, love, timing and 'is this a good week'; synthesizes Western/Vedic/HD/BaZi/Destiny Matrix into one plain reading. Hungarian: horoszkóp, csillagok, sors."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

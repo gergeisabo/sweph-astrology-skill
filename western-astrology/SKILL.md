@@ -1,6 +1,6 @@
 ---
 name: western-astrology
-description: "Use when computing Western tropical astrology — natal charts, aspects, dignities, transits, synastry, solar return, progressions, profections, firdaria, eclipses, ACG. Runs live local astrologica engine."
+description: "Use when computing a Western natal chart, transits, or timing. Rising sign/ascendant, aspects, dignities, synastry/partners, solar return, profections, eclipses, ACG. Hungarian: horoszkóp, csillagjegy, aszcendens."
 version: 1.0.0
 author: Hermes Agent
 metadata:

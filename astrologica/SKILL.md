@@ -1,6 +1,6 @@
 ---
 name: astrologica
-description: "Use when any birth chart or astrological calculation is needed. Shared hub: birth data, positions, houses, CLI, gold birth; routes each system to its dedicated skill."
+description: "Use when computing planetary positions, houses, or the astro CLI. Shared foundation for the astrologica engine - NOT a catch-all: route 'read my chart' and money/purpose questions to astrology-readings, and named systems to their own skill."
 version: 3.0.0
 author: Hermes Agent
 metadata:
@@ -67,7 +67,7 @@ Uranus, Neptune, Pluto, Rahu, Ketu, Chiron, Lilith
 - `Rahu` = North Node (NOT "North Node"); `Ketu` = South Node (computed as opposite of Rahu)
 - **Node mode matters (~1.4°):** Rahu/Ketu default to the **MEAN** node — classical
   Jyotish convention, and what the reference chart quotes (Capricorn 26°42' = 296.713°).
-  The TRUE node is 298.869° for the gold birth — a 1.1565° (69.4') gap. Override per call
+  The TRUE node is 297.869° for the gold birth — a 1.1565° (69.4') gap. Override per call
   (`compute_positions(birth, node="true")`), per CLI (`--node true`), or env
   `ASTROLOGICA_NODE=true`. Always state which mode a published node used before calling
   it "wrong".

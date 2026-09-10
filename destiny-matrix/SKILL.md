@@ -1,6 +1,6 @@
 ---
 name: destiny-matrix
-description: "Use when computing the Destiny Matrix (Матрица судьбы / Ladini) chakra table, karmic tail, or arcana math. Authoritative formulas; the engine's astrologica.destiny now computes this exact matrix."
+description: "Use when computing the Destiny Matrix chakra table or arcana math. Ladini karmic tail, comfort zone, chakra map. Hungarian: sorsmátrix, mátrix, Матрица судьбы."
 version: 2.0.0
 author: Hermes Agent
 license: MIT

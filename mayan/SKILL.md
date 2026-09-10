@@ -1,6 +1,6 @@
 ---
 name: mayan
-description: "Use when a Mayan calendar reading is needed (Tzolkin, Haab, Long Count, Dreamspell, compatibility). Date strings only — no BirthData, no birth time or place required."
+description: "Use when a Mayan calendar reading is needed. Tzolkin, Haab, Long Count, Dreamspell, compatibility. Date strings only - no birth time needed. Hungarian: maja naptár."
 version: 1.0.0
 author: Hermes Agent
 metadata:

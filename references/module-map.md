@@ -1,5 +1,17 @@
 # Astrologica Module Map
 
+> **SUPERSEDED (2026-09-10) — DO NOT TRUST THE SYMBOL NAMES BELOW.**
+> This was the old monolith's reference file. When the monolith was split into
+> per-system skills (2026-09-06) it was never moved under a skill directory and
+> nothing references it. Its function names are stale and several do not exist:
+> `destiny.compute_destiny` (real: `compute`), `numerology.pythagorean` /
+> `.chaldean` / `.kabbalistic` (real: `life_path_number`, `full_profile`,
+> `vedic_number`), `divination.tarot_daily` / `.iching` / `.runes` / `.geomancy`
+> (real: `tarot_draw`, `tarot_spread`, `iching_lookup`, `runes_draw`,
+> `geomancy_cast`). It also omits `cli.py`, `gochara.py`, `horary.py`,
+> `lunar.py`, `shadbala.py`. Authoritative module map: the `astrologica` skill.
+
+
 Quick reference for which module to import for each task.
 
 ## Core

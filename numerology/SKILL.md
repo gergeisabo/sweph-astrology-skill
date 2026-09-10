@@ -1,6 +1,6 @@
 ---
 name: numerology
-description: "Use when computing numerology from a name and/or birth date (life path, soul urge, expression, vedic, chaldean, kabbalistic). Date strings and names — no BirthData."
+description: "Use when computing numerology from a name or birth date. Life path, soul urge, expression, chaldean, kabbalistic, vedic. Hungarian: számmisztika, életszám, sorsszám."
 version: 1.0.0
 author: Hermes Agent
 metadata:

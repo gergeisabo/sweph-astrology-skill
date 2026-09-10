@@ -1,6 +1,6 @@
 ---
 name: human-design
-description: "Use when computing Human Design charts, type/authority/profile, transits, compatibility, or Rave Variables. Live-verified against the gold birth."
+description: "Use when computing Human Design type, authority, profile, or gates. Bodygraph, channels, transits, compatibility/partners, Rave Variables. Hungarian: humán design, típus."
 version: 1.0.0
 metadata:
   hermes:

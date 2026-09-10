@@ -1,6 +1,6 @@
 ---
 name: bazi
-description: "Use when computing BaZi Four Pillars, Ten Gods, luck pillars, or element balance. Live-verified against the gold birth."
+description: "Use when computing Chinese BaZi four pillars, day master, or luck pillars. Ten Gods, element balance, kua number. Hungarian: kínai horoszkóp, sors, szerencse."
 version: 1.0.0
 metadata:
   hermes:

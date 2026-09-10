@@ -1,6 +1,6 @@
 ---
 name: pyswisseph-pitfalls
-description: "Use when building astrology engines with pyswisseph."
+description: "Use when building or debugging astrology engines with pyswisseph. Silent-failure API pitfalls, sidereal mode traps, ephemeris setup."
 version: 1.0.0
 author: Hermes Agent
 license: MIT
@@ -8,6 +8,7 @@ metadata:
   hermes:
     tags: [astrology, swisseph, pyswisseph, ephemeris, python, pitfalls]
     category: astrology
+    related_skills: [astrologica]
 ---
 
 # Pyswisseph Pitfalls
@@ -231,6 +232,14 @@ published source); inventing one produces authoritative-looking wrong output tha
 can't catch because the test fixtures came from the same invention. If the requested
 table doesn't exist, say so and implement the real system instead.
 
+**The same rule governs COPYING a table, not just inventing one.** A table found in an
+archive, an older draft, or another model's write-up looks authoritative precisely because
+it is formatted as reference data — and it can carry two errors at once that nothing in
+your tree will catch. Before merging such a table, verify each row against independent
+published sources. Expect a wrong *name* and a non-standard *formation rule* to travel
+together, and treat agent consensus as no evidence: several subagents reading the same
+wrong table will all recommend merging it verbatim.
+
 ## 16. Probe boundary inputs before calling an engine robust
 
 An all-green suite from happy-path fixtures says nothing about edge inputs. Before
@@ -263,7 +272,7 @@ events reported at 00:00/12:00 exactly). Regression-check against a published in
 ## 19. The lunar node has TWO modes — check which one a reference used
 
 `swe.TRUE_NODE` and `swe.MEAN_NODE` are different bodies, not synonyms, and they can
-differ by **up to ~1.4°** (at 1991-02-15 18:45 CET: true = 298.869°, mean = 296.713°,
+differ by **up to ~1.4°** (at 1991-02-15 18:45 CET: true = 297.869°, mean = 296.713°,
 a gap of 69.4 arc-min). A published node that "doesn't match" is usually the other mode,
 not a bug — but an unexplained 1°+ node discrepancy will otherwise sit in a project for
 months (this one did).
@@ -290,3 +299,38 @@ index into plausible-looking garbage — `sihua_for_stem(10)` returned stem-0's 
 without a whisper. Range-check every index argument at function entry
 (`if not 0 <= idx <= 9: raise ValueError(...)`) so bad input is loud, even when a
 wrapping caller "would have worked".
+
+## 21. A green suite calibrated on a wrong anchor verifies nothing
+
+An all-green suite with a *tight* tolerance can be certifying the wrong chart. If the
+fixture's INPUT is wrong (wrong birth time, wrong coordinates, wrong tz handling), every
+expected value derived from that input is wrong in the same direction — so the suite
+passes, and the tight tolerance is exactly what makes it look rigorous. Symptom: the
+tests agree with each other and with the docs, but disagree with reality.
+
+Distinct from §16: that is about missing coverage; this is about a wrong baseline.
+
+Before trusting a reference suite, attack its anchor: re-derive the fixture from a source
+independent of your own code path (a different calculator, a published report, a second
+export by the same service with known settings) and assert against THAT. Cross-check a
+value that falls out of two independent paths — e.g. tropical longitude and local
+sidereal time must both move consistently when the input time moves. A leftover
+inconsistency between two derivations is the tell that you are on the wrong anchor.
+
+Hardening that follows: assert the input INTERPRETATION explicitly (one test naming the
+local time and the UT it equals), widen the tolerance only where rounding justifies it and
+say so in a comment, and prefer relational assertions over absolute ones —
+`sidereal == tropical - ayanamsa`, `Ketu == Rahu + 180`, `len(pos) == N`. A relation fails
+loudly when the anchor drifts; an absolute value silently re-ratifies it.
+
+## 22. A CLI positional sharing a parent parser's option name is silently dead
+
+`add_parser("transits", parents=[common])` plus `add_argument("date")` puts the positional
+into the SAME `args.date` dest as the parent's `--date` flag. The option handler then reads
+the positional's value, concludes a date was supplied, and errors on the missing
+latitude — so a documented subcommand fails 100% of the time while looking perfectly
+correct in `--help`. Neither the parser nor `--help` warns you.
+
+Give every positional a dest no option uses (`when`, not `date`), and add a regression
+test that invokes each subcommand WITH its positional argument. A subcommand that only
+ever gets tested bare will keep this bug indefinitely.
